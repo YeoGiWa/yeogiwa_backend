@@ -1,4 +1,4 @@
-package com.example.yeogiwa.dto;
+package com.example.yeogiwa.dto.user;
 
 import lombok.Getter;
 import lombok.Setter;

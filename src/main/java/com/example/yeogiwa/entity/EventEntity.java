@@ -1,6 +1,5 @@
 package com.example.yeogiwa.entity;
 
-import com.example.yeogiwa.security.Role;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -19,50 +18,45 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
-@Table(name = "user")
-public class UserEntity {
-
+@Table(name = "event")
+public class EventEntity {
     /* Keys */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "user_id")
+    @Column(name = "event_id")
     private UUID id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "host_id")
+    private HostEntity host;
+
     /* Columns */
-    @NonNull
     @Column(nullable = false)
-    private String email;
-
-    @NonNull
-    @Column(nullable = false)
-    private String password;
-
-    @Column
     private String name;
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(32) DEFAULT 'ROLE_USER'")
-    @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private Role role = Role.ROLE_USER;
+    @Column(nullable = false)
+    private String place;
+
+    @Column(nullable = false)
+    private Date date;
+
+    @Column(nullable = false)
+    private int ratio;
 
     @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    @Column(nullable = false, insertable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
-    @Builder.Default
-    private Boolean isDeleted = false;
-
     /* Related */
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "event")
     @Builder.Default
     private List<AmbassadorEntity> ambassadors = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "event")
     @Builder.Default
-    private List<HostEntity> hosts = new ArrayList<>();
+    private List<PromotedEntity> promotes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "event")
     @Builder.Default
-    private List<PointEntity> points = new ArrayList<>();
+    private List<FundEntity> funds = new ArrayList<>();
 }

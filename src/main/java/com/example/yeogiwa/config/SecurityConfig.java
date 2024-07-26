@@ -51,7 +51,7 @@ public class SecurityConfig {
                 .formLogin((auth) -> auth.disable()) // form login disable
                 .httpBasic((auth) -> auth.disable()) // http basic disable
                 .authorizeHttpRequests((auth) -> auth // URL별 권한 관리
-                        .requestMatchers("/login", "/", "/register", "/api-docs", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api-docs", "/swagger-ui/**", "/v3/api-docs/**", "/login", "/user/register", "/event/{event_id}", "/event/list", "/event/nearby/list").permitAll() // Swagger 관련
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class)

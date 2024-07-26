@@ -10,6 +10,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -25,7 +27,7 @@ class UserServiceTest {
     @Test
     void createUser() {
         UserEntity user1 = UserEntity.builder()
-                .email("test1@example.com")
+                .email("test@example.com")
                 .password(bCryptPasswordEncoder.encode("test1"))
                 .build();
         UserEntity user2 = UserEntity.builder()
@@ -33,11 +35,11 @@ class UserServiceTest {
                 .password(bCryptPasswordEncoder.encode("test2"))
                 .role(Role.ROLE_ADMIN)
                 .build();
-        userRepository.save(user1);
-        userRepository.save(user2);
+        user1 = userRepository.save(user1);
+        user2 = userRepository.save(user2);
 
-        UserEntity result = userRepository.findById(2);
-
-        assertThat(result.getId()).isEqualTo(2);
+        UserEntity result = userRepository.findById(user1.getId());
+//
+        assertThat(result.getId()).isInstanceOf(UUID.class);
     }
 }

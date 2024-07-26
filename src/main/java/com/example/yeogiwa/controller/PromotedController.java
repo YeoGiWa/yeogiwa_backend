@@ -1,17 +1,15 @@
 package com.example.yeogiwa.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
+import com.example.yeogiwa.service.PromotedService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/promoted")
 @ResponseBody
-public class AdminController {
-
-    @GetMapping("/")
-    public String adminTest() {
-        return "Admin Controller";
-    }
+@RequiredArgsConstructor
+public class PromotedController {
+    private final PromotedService promotedService;
 }
