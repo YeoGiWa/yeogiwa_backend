@@ -1,12 +1,12 @@
 package com.example.yeogiwa.entity;
 
+import com.example.yeogiwa.service.event.entity.EventEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.lang.NonNull;
 
 import java.util.ArrayList;
 import java.util.Date;

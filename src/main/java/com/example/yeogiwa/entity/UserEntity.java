@@ -1,6 +1,7 @@
 package com.example.yeogiwa.entity;
 
 import com.example.yeogiwa.security.Role;
+import com.example.yeogiwa.service.ambassador.entity.AmbassadorEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;

@@ -1,5 +1,8 @@
-package com.example.yeogiwa.entity;
+package com.example.yeogiwa.service.ambassador.entity;
 
+import com.example.yeogiwa.entity.PromotedEntity;
+import com.example.yeogiwa.entity.UserEntity;
+import com.example.yeogiwa.service.event.entity.EventEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
