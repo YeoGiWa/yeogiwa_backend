@@ -137,7 +137,6 @@ public class EventService {
             .endAt(LocalDate.parse(festivalDetailIntroDto.getEventenddate(), formatter))
             .address(festivalDetailDto.getAddr1())
             .imageUrl(festivalDetailDto.getFirstimage())
-            .createdAt(request.getCreatedAt())
             .build();
 
         EventEntity savedEvent = eventRepository.save(event);

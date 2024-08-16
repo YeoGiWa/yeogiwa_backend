@@ -23,7 +23,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
-@SQLDelete(sql = "UPDATE event SET deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE event SET is_deleted = true WHERE id = ?")
 @Where(clause = "deleted = false")
 @Table(name = "event")
 public class EventEntity {
@@ -52,6 +52,10 @@ public class EventEntity {
     @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
+    @Column(nullable = false, insertable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Builder.Default
+    private Boolean isDeleted = false;
 
     private LocalDate startAt;
 

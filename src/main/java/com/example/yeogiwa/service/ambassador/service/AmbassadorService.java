@@ -33,7 +33,6 @@ public class AmbassadorService {
                 .user(user)
                 .event(event)
                 .qr(null)
-                .createdAt(new Date())
                 .build();
 
         return ambassadorRepository.save(ambassador);

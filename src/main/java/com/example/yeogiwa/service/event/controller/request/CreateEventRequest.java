@@ -19,6 +19,4 @@ public class CreateEventRequest {
     private String place;
 
     private int ratio;
-
-    private Date createdAt;
 }
