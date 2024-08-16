@@ -45,9 +45,9 @@ public class EventService {
         Boolean isValid = startAt.isBefore(LocalDate.now()) && endAt.isAfter(LocalDate.now());
 
         return event.map(eventEntity ->
-            new GetEventResponse(festivalDetailDto, festivalDetailIntroDto, festivalDetailInfoDtos, festivalDetailImageDtos, eventEntity.getRatio(), festivalDetailIntroDto.getEventstartdate(), festivalDetailIntroDto.getEventenddate(), isValid, eventEntity.getCreatedAt()))
+            new GetEventResponse(festivalDetailDto, festivalDetailIntroDto, festivalDetailInfoDtos, festivalDetailImageDtos, eventEntity.getRatio(), eventEntity.getStartAt(), eventEntity.getEndAt(), isValid, eventEntity.getCreatedAt()))
             .orElseGet(() ->
-                new GetEventResponse(festivalDetailDto, festivalDetailIntroDto, festivalDetailInfoDtos, festivalDetailImageDtos, null, festivalDetailIntroDto.getEventstartdate(), festivalDetailIntroDto.getEventenddate(), isValid, null));
+                new GetEventResponse(festivalDetailDto, festivalDetailIntroDto, festivalDetailInfoDtos, festivalDetailImageDtos, null, LocalDate.parse(festivalDetailIntroDto.getEventstartdate(), formatter), LocalDate.parse(festivalDetailIntroDto.getEventenddate(), formatter), isValid, null));
     }
 
     public ListEventResponse listEvents(int numOfRows, int pageNo, Sort sort, Region region, String eventStartDate, String eventEndDate) {
@@ -75,9 +75,7 @@ public class EventService {
                 Optional<EventEntity> event = Optional.ofNullable(eventMap.get(festival.getContentid()));
 
                 Optional<Boolean> isValid = event.map(eventEntity -> {
-                    LocalDate startAt = LocalDate.parse(eventEntity.getStartAt(), formatter);
-                    LocalDate endAt = LocalDate.parse(eventEntity.getEndAt(), formatter);
-                    return startAt.isBefore(LocalDate.now()) && endAt.isAfter(LocalDate.now());
+                    return eventEntity.getStartAt().isBefore(LocalDate.now()) && eventEntity.getEndAt().isAfter(LocalDate.now());
                 });
 
                 return event.map(eventEntity ->
@@ -112,11 +110,7 @@ public class EventService {
 
                 Optional<EventEntity> event = Optional.ofNullable(eventMap.get(festival.getContentid()));
 
-                Optional<Boolean> isValid = event.map(eventEntity -> {
-                    LocalDate startAt = LocalDate.parse(eventEntity.getStartAt(), formatter);
-                    LocalDate endAt = LocalDate.parse(eventEntity.getEndAt(), formatter);
-                    return startAt.isBefore(LocalDate.now()) && endAt.isAfter(LocalDate.now());
-                });
+                Optional<Boolean> isValid = event.map(eventEntity -> eventEntity.getStartAt().isBefore(LocalDate.now()) && eventEntity.getEndAt().isAfter(LocalDate.now()));
 
                 return event.map(eventEntity ->
                     new GetEventResponse(festival, null, null, null, null, eventEntity.getStartAt(), eventEntity.getEndAt(), isValid.get(), eventEntity.getCreatedAt()))
@@ -139,8 +133,8 @@ public class EventService {
             .name(request.getName())
             .place(request.getPlace())
             .ratio(request.getRatio())
-            .startAt(festivalDetailIntroDto.getEventstartdate())
-            .endAt(festivalDetailIntroDto.getEventenddate())
+            .startAt(LocalDate.parse(festivalDetailIntroDto.getEventstartdate(), formatter))
+            .endAt(LocalDate.parse(festivalDetailIntroDto.getEventenddate(), formatter))
             .address(festivalDetailDto.getAddr1())
             .imageUrl(festivalDetailDto.getFirstimage())
             .createdAt(request.getCreatedAt())

@@ -13,6 +13,7 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -52,9 +53,9 @@ public class EventEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    private String startAt;
+    private LocalDate startAt;
 
-    private String endAt;
+    private LocalDate endAt;
 
     private String address;
 

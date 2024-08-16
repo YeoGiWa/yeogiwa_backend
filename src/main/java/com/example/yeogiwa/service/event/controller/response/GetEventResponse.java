@@ -23,13 +23,13 @@ public class GetEventResponse {
     private List<FestivalDetailInfoDto> festivalDetailInfoDtos;
     private List<FestivalDetailImageDto> festivalDetailImageDtos;
     private Integer ratio;
-    private String startAt;
-    private String endAt;
+    private LocalDate startAt;
+    private LocalDate endAt;
     private Boolean isValid;
     private Date createdAt;
 
 
-    public GetEventResponse(FestivalDetailDto festivalDetailDto, FestivalDetailIntroDto festivalDetailIntroDto, List<FestivalDetailInfoDto> festivalDetailInfoDtos, List<FestivalDetailImageDto> festivalDetailImageDtos, Integer ratio, String startAt, String endAt, Boolean isValid, Date createdAt) {
+    public GetEventResponse(FestivalDetailDto festivalDetailDto, FestivalDetailIntroDto festivalDetailIntroDto, List<FestivalDetailInfoDto> festivalDetailInfoDtos, List<FestivalDetailImageDto> festivalDetailImageDtos, Integer ratio, LocalDate startAt, LocalDate endAt, Boolean isValid, Date createdAt) {
         this.festivalDetailDto = festivalDetailDto;
         this.festivalDetailIntroDto = festivalDetailIntroDto;
         this.festivalDetailInfoDtos = festivalDetailInfoDtos;
