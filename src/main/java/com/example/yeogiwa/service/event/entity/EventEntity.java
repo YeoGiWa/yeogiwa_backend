@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,6 +22,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
+@SQLDelete(sql = "UPDATE event SET deleted = true WHERE id = ?")
+@Where(clause = "deleted = false")
 @Table(name = "event")
 public class EventEntity {
     /* Keys */
