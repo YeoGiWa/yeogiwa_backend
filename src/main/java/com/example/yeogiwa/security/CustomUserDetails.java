@@ -1,6 +1,6 @@
 package com.example.yeogiwa.security;
 
-import com.example.yeogiwa.entity.UserEntity;
+import com.example.yeogiwa.service.user.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

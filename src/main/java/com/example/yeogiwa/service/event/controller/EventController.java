@@ -45,14 +45,12 @@ public class EventController {
         @ApiResponse(responseCode = "400", description = "오류로 인해 이벤트의 정보를 반환하지 못함", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
     })
     @GetMapping("/list")
-    public ResponseEntity<ListEventResponse> listEvents(@RequestParam("numOfRows") int numOfRows, @RequestParam("pageNo") int pageNo, @RequestParam("sort") Sort sort, @RequestParam("region") Region region, @RequestParam(name = "keyword", required = false) String keyword, @RequestParam(name = "eventStartDate", required = false) String eventStartDate, @RequestParam(name = "eventEndDate", required = false) String eventEndDate) {
-        if(keyword == null) {
-            if (eventStartDate == null || eventStartDate.length() != 8 || (eventEndDate != null && eventEndDate.length() != 8) || (eventEndDate != null && eventStartDate.compareTo(eventEndDate) > 0)) {
-                return ResponseEntity.status(400).body(null);
-            }
+    public ResponseEntity<ListEventResponse> listEvents(@RequestParam("numOfRows") int numOfRows, @RequestParam("pageNo") int pageNo, @RequestParam("sort") Sort sort, @RequestParam("region") Region region, @RequestParam(name = "eventStartDate", required = false) String eventStartDate, @RequestParam(name = "eventEndDate", required = false) String eventEndDate) {
+        if (eventStartDate == null || eventStartDate.length() != 8 || (eventEndDate != null && eventEndDate.length() != 8) || (eventEndDate != null && eventStartDate.compareTo(eventEndDate) > 0)) {
+            return ResponseEntity.status(400).body(null);
         }
 
-        ListEventResponse event = eventService.listEvents(numOfRows, pageNo, sort, region, keyword, eventStartDate, eventEndDate);
+        ListEventResponse event = eventService.listEvents(numOfRows, pageNo, sort, region, eventStartDate, eventEndDate);
 
         return ResponseEntity.status(200).body(event);
     }

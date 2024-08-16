@@ -1,17 +1,13 @@
 package com.example.yeogiwa.service.ambassador.service;
 
-import com.example.yeogiwa.entity.UserEntity;
-import com.example.yeogiwa.repository.UserRepository;
+import com.example.yeogiwa.service.user.entity.UserEntity;
+import com.example.yeogiwa.service.user.repository.UserRepository;
 import com.example.yeogiwa.service.ambassador.controller.request.CreateAmbassadorRequest;
 import com.example.yeogiwa.service.ambassador.entity.AmbassadorEntity;
 import com.example.yeogiwa.service.ambassador.repository.AmbassadorRepository;
-import com.example.yeogiwa.service.event.controller.response.ListEventResponse;
 import com.example.yeogiwa.service.event.entity.EventEntity;
 import com.example.yeogiwa.service.event.repository.EventRepository;
-import com.example.yeogiwa.service.event.service.EventService;
-import jdk.jfr.Event;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

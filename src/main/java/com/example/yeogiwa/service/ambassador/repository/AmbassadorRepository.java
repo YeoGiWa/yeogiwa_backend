@@ -1,6 +1,6 @@
 package com.example.yeogiwa.service.ambassador.repository;
 
-import com.example.yeogiwa.entity.UserEntity;
+import com.example.yeogiwa.service.user.entity.UserEntity;
 import com.example.yeogiwa.service.ambassador.entity.AmbassadorEntity;
 import com.example.yeogiwa.service.event.entity.EventEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

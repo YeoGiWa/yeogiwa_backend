@@ -1,7 +1,7 @@
 package com.example.yeogiwa.security;
 
-import com.example.yeogiwa.entity.UserEntity;
-import com.example.yeogiwa.repository.UserRepository;
+import com.example.yeogiwa.service.user.entity.UserEntity;
+import com.example.yeogiwa.service.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

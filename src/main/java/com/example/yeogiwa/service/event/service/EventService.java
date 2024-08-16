@@ -50,19 +50,9 @@ public class EventService {
                 new GetEventResponse(festivalDetailDto, festivalDetailIntroDto, festivalDetailInfoDtos, festivalDetailImageDtos, null, festivalDetailIntroDto.getEventstartdate(), festivalDetailIntroDto.getEventenddate(), isValid, null));
     }
 
-    public ListEventResponse listEvents(int numOfRows, int pageNo, Sort sort, Region region, String keyword, String eventStartDate, String eventEndDate) {
-        List<FestivalDetailDto> festivals = null;
-        if (keyword != null) {
-            festivals = openApiService.listFestivalDetailsByKeyword(numOfRows, pageNo, sort, region, keyword);
-        } else {
-            festivals = openApiService.listFestivalDetails(numOfRows, pageNo, sort, region, eventStartDate, eventEndDate);
-//            TODO: 의미가 없다
-//            if (keyword != null) {
-//                festivals = festivals.stream()
-//                    .filter(festival -> festival.getTitle().contains(keyword))
-//                    .toList();
-//            }
-        }
+    public ListEventResponse listEvents(int numOfRows, int pageNo, Sort sort, Region region, String eventStartDate, String eventEndDate) {
+//            festivals = openApiService.listFestivalDetailsByKeyword(numOfRows, pageNo, sort, region);
+        List<FestivalDetailDto> festivals = openApiService.listFestivalDetails(numOfRows, pageNo, sort, region, eventStartDate, eventEndDate);
 
         if (festivals == null)
             return null;
@@ -75,19 +65,25 @@ public class EventService {
 
         List<GetEventResponse> results = festivals.stream()
             .map(festival -> {
-                // TODO: 시작 및 종료 일자가 상세 조회 API에만 들어있어서 한 번 더 조회가 필요함 -> 전체 조회에서 너무 느림
-                FestivalDetailIntroDto festivalDetailIntroDto = openApiService.getFestivalDetailIntro(festival.getContentid());
-
-                LocalDate startAt = LocalDate.parse(festivalDetailIntroDto.getEventstartdate(), formatter);
-                LocalDate endAt = LocalDate.parse(festivalDetailIntroDto.getEventenddate(), formatter);
-                Boolean isValid = startAt.isBefore(LocalDate.now()) && endAt.isAfter(LocalDate.now());
+                // TODO: 상세 정보는 프론트에서 직접 조회함
+//                FestivalDetailIntroDto festivalDetailIntroDto = openApiService.getFestivalDetailIntro(festival.getContentid());
+//
+//                LocalDate startAt = LocalDate.parse(festivalDetailIntroDto.getEventstartdate(), formatter);
+//                LocalDate endAt = LocalDate.parse(festivalDetailIntroDto.getEventenddate(), formatter);
+//                Boolean isValid = startAt.isBefore(LocalDate.now()) && endAt.isAfter(LocalDate.now());
 
                 Optional<EventEntity> event = Optional.ofNullable(eventMap.get(festival.getContentid()));
 
+                Optional<Boolean> isValid = event.map(eventEntity -> {
+                    LocalDate startAt = LocalDate.parse(eventEntity.getStartAt(), formatter);
+                    LocalDate endAt = LocalDate.parse(eventEntity.getEndAt(), formatter);
+                    return startAt.isBefore(LocalDate.now()) && endAt.isAfter(LocalDate.now());
+                });
+
                 return event.map(eventEntity ->
-                    new GetEventResponse(festival, festivalDetailIntroDto, null, null, eventEntity.getRatio(), festivalDetailIntroDto.getEventstartdate(), festivalDetailIntroDto.getEventenddate(), isValid, eventEntity.getCreatedAt()))
+                    new GetEventResponse(festival, null, null, null, null, eventEntity.getStartAt(), eventEntity.getEndAt(), isValid.get(), eventEntity.getCreatedAt()))
                     .orElseGet(() ->
-                        new GetEventResponse(festival, festivalDetailIntroDto, null, null, null, festivalDetailIntroDto.getEventstartdate(), festivalDetailIntroDto.getEventenddate(), isValid, null));
+                        new GetEventResponse(festival, null, null, null, null, null, null, null, null));
             })
             .toList();
 
@@ -108,19 +104,24 @@ public class EventService {
 
         List<GetEventResponse> results = festivals.stream()
             .map(festival -> {
-                // TODO: 시작 및 종료 일자가 상세 조회 API에만 들어있어서 한 번 더 조회가 필요함 -> 전체 조회에서 너무 느림
-                FestivalDetailIntroDto festivalDetailIntroDto = openApiService.getFestivalDetailIntro(festival.getContentid());
-
-                LocalDate startAt = LocalDate.parse(festivalDetailIntroDto.getEventstartdate(), formatter);
-                LocalDate endAt = LocalDate.parse(festivalDetailIntroDto.getEventenddate(), formatter);
-                Boolean isValid = startAt.isBefore(LocalDate.now()) && endAt.isAfter(LocalDate.now());
+//                FestivalDetailIntroDto festivalDetailIntroDto = openApiService.getFestivalDetailIntro(festival.getContentid());
+//
+//                LocalDate startAt = LocalDate.parse(festivalDetailIntroDto.getEventstartdate(), formatter);
+//                LocalDate endAt = LocalDate.parse(festivalDetailIntroDto.getEventenddate(), formatter);
+//                Boolean isValid = startAt.isBefore(LocalDate.now()) && endAt.isAfter(LocalDate.now());
 
                 Optional<EventEntity> event = Optional.ofNullable(eventMap.get(festival.getContentid()));
 
+                Optional<Boolean> isValid = event.map(eventEntity -> {
+                    LocalDate startAt = LocalDate.parse(eventEntity.getStartAt(), formatter);
+                    LocalDate endAt = LocalDate.parse(eventEntity.getEndAt(), formatter);
+                    return startAt.isBefore(LocalDate.now()) && endAt.isAfter(LocalDate.now());
+                });
+
                 return event.map(eventEntity ->
-                        new GetEventResponse(festival, festivalDetailIntroDto, null, null, eventEntity.getRatio(), festivalDetailIntroDto.getEventstartdate(), festivalDetailIntroDto.getEventenddate(), isValid, eventEntity.getCreatedAt()))
+                    new GetEventResponse(festival, null, null, null, null, eventEntity.getStartAt(), eventEntity.getEndAt(), isValid.get(), eventEntity.getCreatedAt()))
                     .orElseGet(() ->
-                        new GetEventResponse(festival, festivalDetailIntroDto, null, null, null, festivalDetailIntroDto.getEventstartdate(), festivalDetailIntroDto.getEventenddate(), isValid, null));
+                        new GetEventResponse(festival, null, null, null, null, null, null, null, null));
             })
             .toList();
 

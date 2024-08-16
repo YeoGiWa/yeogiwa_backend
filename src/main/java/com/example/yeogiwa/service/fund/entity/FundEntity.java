@@ -1,7 +1,5 @@
-package com.example.yeogiwa.service.ambassador.entity;
+package com.example.yeogiwa.service.fund.entity;
 
-import com.example.yeogiwa.service.promoted.entity.PromotedEntity;
-import com.example.yeogiwa.service.user.entity.UserEntity;
 import com.example.yeogiwa.service.event.entity.EventEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -11,9 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.NonNull;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -21,34 +17,29 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
-@Table(name = "ambassador")
-public class AmbassadorEntity {
-
+@Table(name = "fund")
+public class FundEntity {
     /* Keys */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "ambassador_id")
+    @Column(name = "fund_id")
     private UUID id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     private EventEntity event;
 
     /* Columns */
+    @Column
+    private String title;
+
     @NonNull
     @Column(nullable = false)
-    private String qr;
+    private int amount;
 
     @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
     /* Related */
-    @OneToMany(mappedBy = "ambassador")
-    @Builder.Default
-    private List<PromotedEntity> promotes = new ArrayList<>();
 }
