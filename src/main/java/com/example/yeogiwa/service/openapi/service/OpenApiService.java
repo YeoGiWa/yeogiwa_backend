@@ -29,8 +29,10 @@ public class OpenApiService {
     public List<FestivalDetailDto> listFestivalDetails(int numOfRows, int pageNo, Sort sort, Region region, String eventStartDate, String eventEndDate) {
         GetFestivalDetailResponse response = null;
         try {
+            String regionCode = region == Region.ALL ? null : region.code;
+
             response = openApiClient.listFestival(numOfRows, pageNo, "ETC", "test", "json",
-                "Y", sort.type, region.code, eventStartDate, eventEndDate, serviceKey);
+                "Y", sort.type, regionCode, eventStartDate, eventEndDate, serviceKey);
         } catch (DecodeException e) {
             return null;
         }

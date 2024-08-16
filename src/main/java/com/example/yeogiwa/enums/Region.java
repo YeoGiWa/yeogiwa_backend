@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum Region {
-    ALL(null, "전국"),
+    ALL("0", "전국"),
     SEOUL("1", "서울"),
     INCHEON("2", "인천"),
     DAEJEON("3", "대전"),
