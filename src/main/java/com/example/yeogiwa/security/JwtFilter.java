@@ -1,6 +1,6 @@
 package com.example.yeogiwa.security;
 
-import com.example.yeogiwa.service.user.entity.UserEntity;
+import com.example.yeogiwa.domain.user.UserEntity;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

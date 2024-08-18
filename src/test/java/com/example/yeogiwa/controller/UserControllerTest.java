@@ -1,7 +1,7 @@
 package com.example.yeogiwa.controller;
 
-import com.example.yeogiwa.service.user.controller.UserController;
-import com.example.yeogiwa.service.user.service.UserService;
+import com.example.yeogiwa.domain.user.UserController;
+import com.example.yeogiwa.domain.user.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

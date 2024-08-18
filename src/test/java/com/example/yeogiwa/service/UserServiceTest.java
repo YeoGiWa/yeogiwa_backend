@@ -1,7 +1,7 @@
 package com.example.yeogiwa.service;
 
-import com.example.yeogiwa.service.user.entity.UserEntity;
-import com.example.yeogiwa.service.user.repository.UserRepository;
+import com.example.yeogiwa.domain.user.UserEntity;
+import com.example.yeogiwa.domain.user.UserRepository;
 import com.example.yeogiwa.security.Role;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
