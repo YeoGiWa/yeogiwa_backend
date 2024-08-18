@@ -2,7 +2,7 @@ package com.example.yeogiwa.domain.user;
 
 import com.example.yeogiwa.domain.host.HostEntity;
 import com.example.yeogiwa.domain.point.PointEntity;
-import com.example.yeogiwa.security.Role;
+import com.example.yeogiwa.enums.Role;
 import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
 import jakarta.persistence.*;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.example.yeogiwa.security;
+package com.example.yeogiwa.enums;
 
 import lombok.Getter;
 

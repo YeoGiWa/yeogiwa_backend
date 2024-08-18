@@ -1,0 +1,39 @@
+spring:
+  application:
+  name: yeogiwa
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_DB}?serverTimezone=Asia/Seoul
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: ${DDL_AUTO} # 'update' or 'create' in dev mode, 'validate' in op mode
+    properties:
+      hibernate:
+        # show_sql: true
+        format_sql: true
+    open-in-view: false
+
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-time: ${JWT_EXP_TIME}
+
+openapi:
+  secret-key: ${OPENAPI_KEY}
+
+springdoc:
+  swagger-ui:
+    enabled: true # 'true' in dev mode, 'false' in op mode
+    disable-swagger-default-url: true
+    path: /api-docs
+  show-login-endpoint: true
+
+logging.level:
+  root: INFO
+  org:
+    springframework: WARN
+    hibernate.SQL: DEBUG
+  # org.hibernate.type: trace
