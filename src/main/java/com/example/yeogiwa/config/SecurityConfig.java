@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth // URL별 권한 관리
                         .requestMatchers("/api-docs", "/swagger-ui/**", "/v3/api-docs/**", "/login", "/user/register", "/event/{event_id}", "/event/list", "/event/nearby/list").permitAll() // Swagger 관련
                         .requestMatchers("/admin").hasRole("ADMIN")
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
                 .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class)
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement((session) -> session // session setting
