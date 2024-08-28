@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -23,7 +24,7 @@ public class EventDto {
 
     private int ratio;
 
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
 //    private List<AmbassadorEntity> ambassadors = new ArrayList<>();
 //

@@ -1,7 +1,6 @@
 package com.example.yeogiwa.domain.event;
 
 import com.example.yeogiwa.enums.Region;
-import com.example.yeogiwa.enums.Sort;
 import com.example.yeogiwa.domain.event.dto.CreateEventRequest;
 import com.example.yeogiwa.domain.event.dto.UpdateEventRequest;
 import com.example.yeogiwa.domain.event.dto.GetEventResponse;
@@ -12,10 +11,14 @@ import com.example.yeogiwa.openapi.dto.FestivalDto;
 import com.example.yeogiwa.openapi.dto.FestivalIntroDto;
 import com.example.yeogiwa.openapi.OpenApiService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -47,9 +50,70 @@ public class EventService {
                 new GetEventResponse(festivalDto, festivalIntroDto, festivalInfoDtos, festivalImageDtos, null, LocalDate.parse(festivalIntroDto.getEventstartdate(), formatter), LocalDate.parse(festivalIntroDto.getEventenddate(), formatter), isValid, null));
     }
 
-    public List<GetEventResponse> listEvents(int numOfRows, int pageNo, Sort sort, Region region, String eventStartDate, String eventEndDate) {
-//            festivals = openApiService.listFestivalDetailsByKeyword(numOfRows, pageNo, sort, region);
-        List<FestivalDto> festivals = openApiService.listFestivalDetails(numOfRows, pageNo, sort, region, eventStartDate, eventEndDate);
+    public List<GetEventResponse> listEvents(int numOfRows, int pageNo, Region region, String eventStartDate, String eventEndDate, Boolean isValid) {
+        HashMap<Long, EventEntity> eventMap;
+        if (isValid) {
+            pageNo = pageNo - 1;
+            PageRequest pageable = PageRequest.of(pageNo, 10, Sort.by("startAt").descending());
+            if (eventStartDate == null || eventEndDate == null)
+                if(eventStartDate == null && eventEndDate == null)
+                    eventMap = eventRepository.findAllByStartAtBetweenOrderByStartAtDesc(pageable, LocalDate.of(1900, 1, 1), LocalDate.of(2099, 12, 31))
+                        .stream()
+                        .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
+                else {
+                    assert eventStartDate != null;
+                    eventMap = eventRepository.findAllByStartAtBetweenOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.of(2099, 12, 31))
+                        .stream()
+                        .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
+                }
+            else {
+                Page<EventEntity> event = eventRepository.findAllByStartAtBetweenOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.parse(eventEndDate, formatter));
+                eventMap = event
+                    .stream()
+                    .collect(HashMap::new, (map, event1) -> map.put(event1.getId(), event1), HashMap::putAll);
+            }
+
+            return eventMap.values().stream()
+                .map(eventEntity -> {
+                    FestivalDto festivalDto = FestivalDto.builder()
+                        .contentid(eventEntity.getId())
+                        .title(eventEntity.getName())
+                        .firstimage(eventEntity.getImageUrl())
+                        .addr1(eventEntity.getPlace())
+                        .build();
+
+                    return new GetEventResponse(festivalDto, null, null, null, eventEntity.getRatio(), eventEntity.getStartAt(), eventEntity.getEndAt(), true, eventEntity.getCreatedAt());
+                })
+                .toList();
+        } else {
+            List<FestivalDto> festivals = openApiService.listFestivalDetails(numOfRows, pageNo, region, eventStartDate, eventEndDate);
+
+            if (festivals == null)
+                return null;
+
+            eventMap = eventRepository.findAllByIdIn(festivals.stream()
+                .map(FestivalDto::getContentid)
+                .toList())
+                .stream()
+                .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
+
+            return festivals.stream()
+                .map(festival -> {
+                    Optional<EventEntity> event = Optional.ofNullable(eventMap.get(festival.getContentid()));
+
+                    Boolean isValid1 = event.map(eventEntity -> eventEntity.getStartAt().isBefore(LocalDate.now()) && eventEntity.getEndAt().isAfter(LocalDate.now())).orElse(false);
+
+                    return event.map(eventEntity ->
+                            new GetEventResponse(festival, null, null, null, null, eventEntity.getStartAt(), eventEntity.getEndAt(), isValid1, eventEntity.getCreatedAt()))
+                        .orElseGet(() ->
+                            new GetEventResponse(festival, null, null, null, null, null, null, false, null));
+                })
+                .toList();
+        }
+    }
+
+    public List<GetEventResponse> listEventsNearby(int numOfRows, int pageNo, String mapX, String mapY, String radius) {
+        List<FestivalDto> festivals = openApiService.listNearbyFestival(numOfRows, pageNo, mapX, mapY, radius);
 
         if (festivals == null)
             return null;
@@ -60,51 +124,8 @@ public class EventService {
             .stream()
             .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
 
-        List<GetEventResponse> results = festivals.stream()
+        return festivals.stream()
             .map(festival -> {
-                // TODO: 상세 정보는 프론트에서 직접 조회함
-//                FestivalDetailIntroDto festivalDetailIntroDto = openApiService.getFestivalDetailIntro(festival.getContentid());
-//
-//                LocalDate startAt = LocalDate.parse(festivalDetailIntroDto.getEventstartdate(), formatter);
-//                LocalDate endAt = LocalDate.parse(festivalDetailIntroDto.getEventenddate(), formatter);
-//                Boolean isValid = startAt.isBefore(LocalDate.now()) && endAt.isAfter(LocalDate.now());
-
-                Optional<EventEntity> event = Optional.ofNullable(eventMap.get(festival.getContentid()));
-
-                Optional<Boolean> isValid = event.map(eventEntity -> {
-                    return eventEntity.getStartAt().isBefore(LocalDate.now()) && eventEntity.getEndAt().isAfter(LocalDate.now());
-                });
-
-                return event.map(eventEntity ->
-                    new GetEventResponse(festival, null, null, null, null, eventEntity.getStartAt(), eventEntity.getEndAt(), isValid.get(), eventEntity.getCreatedAt()))
-                    .orElseGet(() ->
-                        new GetEventResponse(festival, null, null, null, null, null, null, null, null));
-            })
-            .toList();
-
-        return results;
-    }
-
-    public List<GetEventResponse> listEventsNearby(int numOfRows, int pageNo, Sort sort, String mapX, String mapY, String radius) {
-        List<FestivalDto> festivals = openApiService.listNearbyFestival(numOfRows, pageNo, sort, mapX, mapY, radius);
-
-        if (festivals == null)
-            return null;
-
-        HashMap<Long, EventEntity> eventMap = eventRepository.findAllByIdIn(festivals.stream()
-                .map(FestivalDto::getContentid)
-                .toList())
-            .stream()
-            .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
-
-        List<GetEventResponse> results = festivals.stream()
-            .map(festival -> {
-//                FestivalDetailIntroDto festivalDetailIntroDto = openApiService.getFestivalDetailIntro(festival.getContentid());
-//
-//                LocalDate startAt = LocalDate.parse(festivalDetailIntroDto.getEventstartdate(), formatter);
-//                LocalDate endAt = LocalDate.parse(festivalDetailIntroDto.getEventenddate(), formatter);
-//                Boolean isValid = startAt.isBefore(LocalDate.now()) && endAt.isAfter(LocalDate.now());
-
                 Optional<EventEntity> event = Optional.ofNullable(eventMap.get(festival.getContentid()));
 
                 Optional<Boolean> isValid = event.map(eventEntity -> eventEntity.getStartAt().isBefore(LocalDate.now()) && eventEntity.getEndAt().isAfter(LocalDate.now()));
@@ -115,8 +136,6 @@ public class EventService {
                         new GetEventResponse(festival, null, null, null, null, null, null, null, null));
             })
             .toList();
-
-        return results;
     }
 
     @Transactional
@@ -128,11 +147,10 @@ public class EventService {
         EventEntity event = EventEntity.builder()
             .id(festivalDto.getContentid())
             .name(request.getName())
-            .place(request.getPlace())
+            .place(festivalDto.getAddr1())
             .ratio(request.getRatio())
             .startAt(LocalDate.parse(festivalIntroDto.getEventstartdate(), formatter))
             .endAt(LocalDate.parse(festivalIntroDto.getEventenddate(), formatter))
-            .address(festivalDto.getAddr1())
             .imageUrl(festivalDto.getFirstimage())
             .build();
 
@@ -149,12 +167,18 @@ public class EventService {
         event.setName(request.getName());
         event.setPlace(request.getPlace());
         event.setRatio(request.getRatio());
-        event.setCreatedAt(request.getCreatedAt());
+        event.setCreatedAt(LocalDateTime.now());
 
         EventEntity updatedEvent = eventRepository.save(event);
 
         return EventDto.from(updatedEvent);
     }
 
-    // TODO: 삭제가 필요할까? 비즈니스 적으로 삭제는 없어야 하지 않을까?
+    @Transactional
+    public void deleteEvent(String id) {
+        EventEntity event = eventRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+
+        eventRepository.delete(event);
+    }
 }

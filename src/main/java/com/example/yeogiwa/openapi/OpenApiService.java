@@ -1,7 +1,7 @@
 package com.example.yeogiwa.openapi;
 
 import com.example.yeogiwa.enums.Region;
-import com.example.yeogiwa.enums.Sort;
+import com.example.yeogiwa.enums.EventSort;
 import com.example.yeogiwa.openapi.dto.response.FestivalResponse;
 import com.example.yeogiwa.openapi.dto.FestivalInfoDto;
 import com.example.yeogiwa.openapi.dto.FestivalImageDto;
@@ -22,13 +22,13 @@ public class OpenApiService {
 
     @Value("${openapi.secret-key}") private String serviceKey;
 
-    public List<FestivalDto> listFestivalDetails(int numOfRows, int pageNo, Sort sort, Region region, String eventStartDate, String eventEndDate) {
+    public List<FestivalDto> listFestivalDetails(int numOfRows, int pageNo, Region region, String eventStartDate, String eventEndDate) {
         FestivalResponse<FestivalDto> response = null;
         try {
             String regionCode = region == Region.ALL ? null : region.code;
 
             response = openApiClient.listFestival(numOfRows, pageNo, "ETC", "test", "json",
-                "Y", sort.type, regionCode, eventStartDate, eventEndDate, serviceKey);
+                "Y", EventSort.CREATING.type, regionCode, eventStartDate, eventEndDate, serviceKey);
         } catch (DecodeException e) {
             return null;
         }
@@ -40,11 +40,11 @@ public class OpenApiService {
         return null;
     }
 
-    public List<FestivalDto> listFestivalDetailsByKeyword(int numOfRows, int pageNo, Sort sort, Region region, String keyword) {
+    public List<FestivalDto> listFestivalDetailsByKeyword(int numOfRows, int pageNo, EventSort eventSort, Region region, String keyword) {
         FestivalResponse<FestivalDto> response = null;
         try {
             response = openApiClient.listFestivalByKeyword(numOfRows, pageNo, "ETC", "test", "json",
-                "Y", sort.type, region.code, keyword, "15", serviceKey);
+                "Y", eventSort.type, region.code, keyword, "15", serviceKey);
         } catch(DecodeException e) {
             return null;
         }
@@ -56,11 +56,11 @@ public class OpenApiService {
         return null;
     }
 
-    public List<FestivalDto> listNearbyFestival(int numOfRows, int pageNo, Sort sort, String mapX, String mapY, String radius) {
+    public List<FestivalDto> listNearbyFestival(int numOfRows, int pageNo, String mapX, String mapY, String radius) {
         FestivalResponse<FestivalDto> response = null;
         try {
             response = openApiClient.listNearbyFestival(numOfRows, pageNo, "ETC", "test", "json",
-                "Y", sort.type, mapX, mapY, radius, "15", serviceKey);
+                "Y", EventSort.CREATING.type, mapX, mapY, radius, "15", serviceKey);
         } catch(DecodeException e) {
             return null;
         }
