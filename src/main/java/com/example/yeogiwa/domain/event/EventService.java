@@ -57,20 +57,34 @@ public class EventService {
             PageRequest pageable = PageRequest.of(pageNo, 10, Sort.by("startAt").descending());
             if (eventStartDate == null || eventEndDate == null)
                 if(eventStartDate == null && eventEndDate == null)
-                    eventMap = eventRepository.findAllByStartAtBetweenOrderByStartAtDesc(pageable, LocalDate.of(1900, 1, 1), LocalDate.of(2099, 12, 31))
-                        .stream()
-                        .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
+                    if(region != Region.ALL)
+                        eventMap = eventRepository.findAllByStartAtBetweenAndRegionOrderByStartAtDesc(pageable, LocalDate.of(1900, 1, 1), LocalDate.of(2099, 12, 31), region.code)
+                            .stream()
+                            .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
+                    else
+                        eventMap = eventRepository.findAllByStartAtBetweenOrderByStartAtDesc(pageable, LocalDate.of(1900, 1, 1), LocalDate.of(2099, 12, 31))
+                            .stream()
+                            .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
                 else {
                     assert eventStartDate != null;
-                    eventMap = eventRepository.findAllByStartAtBetweenOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.of(2099, 12, 31))
-                        .stream()
-                        .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
+                    if(region != Region.ALL)
+                        eventMap = eventRepository.findAllByStartAtBetweenAndRegionOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.of(2099, 12, 31), region.code)
+                            .stream()
+                            .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
+                    else
+                        eventMap = eventRepository.findAllByStartAtBetweenOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.parse(eventEndDate, formatter))
+                            .stream()
+                            .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
                 }
             else {
-                Page<EventEntity> event = eventRepository.findAllByStartAtBetweenOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.parse(eventEndDate, formatter));
-                eventMap = event
-                    .stream()
-                    .collect(HashMap::new, (map, event1) -> map.put(event1.getId(), event1), HashMap::putAll);
+                if(region != Region.ALL)
+                    eventMap = eventRepository.findAllByStartAtBetweenAndRegionOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.parse(eventEndDate, formatter), region.code)
+                        .stream()
+                        .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
+                else
+                    eventMap = eventRepository.findAllByStartAtBetweenOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.parse(eventEndDate, formatter))
+                        .stream()
+                        .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
             }
 
             return eventMap.values().stream()
@@ -149,6 +163,7 @@ public class EventService {
             .name(request.getName())
             .place(festivalDto.getAddr1())
             .ratio(request.getRatio())
+            .region(festivalDto.getAreacode().toString())
             .startAt(LocalDate.parse(festivalIntroDto.getEventstartdate(), formatter))
             .endAt(LocalDate.parse(festivalIntroDto.getEventenddate(), formatter))
             .imageUrl(festivalDto.getFirstimage())

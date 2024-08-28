@@ -62,6 +62,8 @@ public class EventEntity {
 
     private String imageUrl;
 
+    private String region;
+
     /* Related */
     @OneToMany(mappedBy = "event")
     @Builder.Default
