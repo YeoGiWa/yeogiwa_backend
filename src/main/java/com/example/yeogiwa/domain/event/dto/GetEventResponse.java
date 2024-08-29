@@ -23,24 +23,15 @@ public class GetEventResponse {
     private FestivalIntroDto festivalIntroDto;
     private List<FestivalInfoDto> festivalInfoDtos;
     private List<FestivalImageDto> festivalImageDtos;
-    private Integer ratio;
-    private LocalDate startAt;
-    private LocalDate endAt;
+    private EventDto event;
     private Boolean isValid;
-    private LocalDateTime createdAt;
-    private List<SessionDto> sessionEntities;
 
-
-    public GetEventResponse(FestivalDto festivalDto, FestivalIntroDto festivalIntroDto, List<FestivalInfoDto> festivalInfoDtos, List<FestivalImageDto> festivalImageDtos, Integer ratio, LocalDate startAt, LocalDate endAt, Boolean isValid, LocalDateTime createdAt, List<SessionDto> sessionEntities) {
+    public GetEventResponse(FestivalDto festivalDto, FestivalIntroDto festivalIntroDto, List<FestivalInfoDto> festivalInfoDtos, List<FestivalImageDto> festivalImageDtos, EventDto event, Boolean isValid) {
         this.festivalDto = festivalDto;
         this.festivalIntroDto = festivalIntroDto;
         this.festivalInfoDtos = festivalInfoDtos;
         this.festivalImageDtos = festivalImageDtos;
-        this.ratio = ratio;
-        this.startAt = startAt;
-        this.endAt = endAt;
+        this.event = event;
         this.isValid = isValid;
-        this.createdAt = createdAt;
-        this.sessionEntities = sessionEntities;
     }
 }

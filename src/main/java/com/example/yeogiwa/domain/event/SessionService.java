@@ -1,25 +1,10 @@
 package com.example.yeogiwa.domain.event;
 
 import com.example.yeogiwa.domain.event.dto.*;
-import com.example.yeogiwa.enums.Region;
-import com.example.yeogiwa.openapi.OpenApiService;
-import com.example.yeogiwa.openapi.dto.FestivalDto;
-import com.example.yeogiwa.openapi.dto.FestivalImageDto;
-import com.example.yeogiwa.openapi.dto.FestivalInfoDto;
-import com.example.yeogiwa.openapi.dto.FestivalIntroDto;
-import jdk.jfr.Event;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -42,7 +27,7 @@ public class SessionService {
 
         sessionRepository.save(session);
 
-        return SessionDto.of(session);
+        return SessionDto.from(session);
     }
 
     @Transactional
@@ -56,7 +41,7 @@ public class SessionService {
 
         sessionRepository.save(session);
 
-        return SessionDto.of(session);
+        return SessionDto.from(session);
     }
 
     @Transactional

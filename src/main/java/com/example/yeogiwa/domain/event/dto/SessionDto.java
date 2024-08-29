@@ -1,8 +1,6 @@
 package com.example.yeogiwa.domain.event.dto;
 
-import com.example.yeogiwa.domain.event.EventEntity;
 import com.example.yeogiwa.domain.event.SessionEntity;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,7 +27,7 @@ public class SessionDto {
     private LocalDateTime createdAt;
 
 
-    public static SessionDto of(SessionEntity sessionEntity) {
+    public static SessionDto from(SessionEntity sessionEntity) {
         return SessionDto.builder()
                 .id(sessionEntity.getId())
                 .count(sessionEntity.getCount())

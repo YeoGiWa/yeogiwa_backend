@@ -1,15 +1,23 @@
 package com.example.yeogiwa.domain.ambassador;
 
+import com.example.yeogiwa.domain.ambassador.dto.AmbassadorDto;
 import com.example.yeogiwa.domain.ambassador.dto.CreateAmbassadorRequest;
+import com.example.yeogiwa.domain.event.dto.EventDto;
+import com.example.yeogiwa.domain.event.dto.GetEventResponse;
+import com.example.yeogiwa.domain.event.dto.SessionDto;
 import com.example.yeogiwa.domain.user.UserEntity;
 import com.example.yeogiwa.domain.user.UserRepository;
 import com.example.yeogiwa.domain.event.EventEntity;
 import com.example.yeogiwa.domain.event.EventRepository;
+import com.example.yeogiwa.openapi.dto.FestivalDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -20,40 +28,41 @@ public class AmbassadorService {
     private final UserRepository userRepository;
 
     @Transactional
-    public AmbassadorEntity createAmbassador(String email, CreateAmbassadorRequest request) {
+    public AmbassadorDto createAmbassador(String email, CreateAmbassadorRequest request) {
         UserEntity user = userRepository.findByEmail(email);
 
         EventEntity event = eventRepository.findById(request.getEventId())
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
+        // TODO: QR 코드 생성
         AmbassadorEntity ambassador = AmbassadorEntity.builder()
                 .user(user)
                 .event(event)
-                .qr(null)
+                .qr("test")
                 .build();
 
-        return ambassadorRepository.save(ambassador);
+        ambassadorRepository.save(ambassador);
+
+        return AmbassadorDto.from(ambassador);
     }
 
-    public AmbassadorEntity getAmbassadorById(UUID id) {
-        return ambassadorRepository.findById(id)
+    @Transactional(readOnly = true)
+    public AmbassadorDto getAmbassadorById(UUID id) {
+        AmbassadorEntity ambassador = ambassadorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ambassador not found"));
+
+        return AmbassadorDto.from(ambassador);
     }
 
-    public List<AmbassadorEntity> listAmbassadorsByEvent(String eventId) {
+    @Transactional(readOnly = true)
+    public List<AmbassadorDto> listAmbassadorsByEvent(String eventId) {
         EventEntity event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
-        return ambassadorRepository.findAllByEvent(event);
-    }
+        List<AmbassadorEntity> ambassadorEntities = ambassadorRepository.findAllByEvent(event);
 
-    public List<EventEntity> listEventsByAmbassador(String email) {
-        UserEntity user = userRepository.findByEmail(email);
-        List<AmbassadorEntity> ambassadors = ambassadorRepository.findAllByUser(user);
-        List<Long> eventIds = ambassadors.stream().map(ambassador -> ambassador.getEvent().getId()).toList();
-
-        List<EventEntity> events = eventRepository.findAllByIdIn(eventIds);
-
-        return events;
+        return ambassadorEntities.stream()
+                .map(AmbassadorDto::from)
+                .toList();
     }
 }

@@ -1,6 +1,10 @@
 package com.example.yeogiwa.domain.event;
 
+import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
+import com.example.yeogiwa.domain.ambassador.AmbassadorRepository;
 import com.example.yeogiwa.domain.event.dto.*;
+import com.example.yeogiwa.domain.user.UserEntity;
+import com.example.yeogiwa.domain.user.UserRepository;
 import com.example.yeogiwa.enums.Region;
 import com.example.yeogiwa.openapi.dto.FestivalInfoDto;
 import com.example.yeogiwa.openapi.dto.FestivalImageDto;
@@ -25,6 +29,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EventService {
     private final OpenApiService openApiService;
+    private final UserRepository userRepository;
+    private final AmbassadorRepository ambassadorRepository;
     private final EventRepository eventRepository;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -44,7 +50,7 @@ public class EventService {
 
         return event.map(eventEntity -> {
             List<SessionDto> sessionDtos = eventEntity.getSessions().stream()
-                    .map(SessionDto::of)
+                    .map(SessionDto::from)
                     .collect(Collectors.toList());
 
             return new GetEventResponse(
@@ -52,12 +58,8 @@ public class EventService {
                     festivalIntroDto,
                     festivalInfoDtos,
                     festivalImageDtos,
-                    eventEntity.getRatio(),
-                    eventEntity.getStartAt(),
-                    eventEntity.getEndAt(),
-                    isValid,
-                    eventEntity.getCreatedAt(),
-                    sessionDtos  // 변환된 List<SessionDto>를 전달
+                    EventDto.from(eventEntity),
+                    isValid
             );
         }).orElseGet(() ->
                 new GetEventResponse(
@@ -66,11 +68,7 @@ public class EventService {
                         festivalInfoDtos,
                         festivalImageDtos,
                         null,
-                        LocalDate.parse(festivalIntroDto.getEventstartdate(), formatter),
-                        LocalDate.parse(festivalIntroDto.getEventenddate(), formatter),
-                        isValid,
-                        null,
-                        null
+                        isValid
                 )
         );
     }
@@ -126,10 +124,10 @@ public class EventService {
                         .build();
 
                     List<SessionDto> sessionDtos = eventEntity.getSessions().stream()
-                        .map(SessionDto::of)  // SessionDto.of(entity) 사용하여 변환
+                        .map(SessionDto::from)  // SessionDto.of(entity) 사용하여 변환
                         .toList();
 
-                    return new GetEventResponse(festivalDto, null, null, null, eventEntity.getRatio(), eventEntity.getStartAt(), eventEntity.getEndAt(), true, eventEntity.getCreatedAt(), sessionDtos);
+                    return new GetEventResponse(festivalDto, null, null, null, EventDto.from(eventEntity), true);
                 })
                 .toList();
         } else {
@@ -152,12 +150,12 @@ public class EventService {
 
                     return event.map(eventEntity -> {
                         List<SessionDto> sessionDtos = eventEntity.getSessions().stream()
-                            .map(SessionDto::of)
+                            .map(SessionDto::from)
                             .toList();
 
-                        return new GetEventResponse(festival, null, null, null, eventEntity.getRatio(), eventEntity.getStartAt(), eventEntity.getEndAt(), isValid1, eventEntity.getCreatedAt(), sessionDtos);
+                        return new GetEventResponse(festival, null, null, null, EventDto.from(eventEntity), isValid1);
                     }).orElseGet(() ->
-                            new GetEventResponse(festival, null, null, null, null, null, null, false, null, null));
+                        new GetEventResponse(festival, null, null, null, null, false));
                 })
                 .toList();
         }
@@ -184,12 +182,12 @@ public class EventService {
 
                 return event.map(eventEntity -> {
                     List<SessionDto> sessionDtos = eventEntity.getSessions().stream()
-                        .map(SessionDto::of)
+                        .map(SessionDto::from)
                         .toList();
 
-                    return new GetEventResponse(festival, null, null, null, eventEntity.getRatio(), eventEntity.getStartAt(), eventEntity.getEndAt(), isValid1, eventEntity.getCreatedAt(), sessionDtos);
+                    return new GetEventResponse(festival, null, null, null, EventDto.from(eventEntity), isValid1);
                 }).orElseGet(() ->
-                        new GetEventResponse(festival, null, null, null, null, null, null, false, null, null));
+                        new GetEventResponse(festival, null, null, null, null, false));
             })
             .toList();
     }
@@ -237,5 +235,28 @@ public class EventService {
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
         eventRepository.delete(event);
+    }
+
+    @Transactional(readOnly = true)
+    public List<EventDto> listEventsByAmbassador(String email, Boolean isValid) {
+        UserEntity user = userRepository.findByEmail(email);
+        List<AmbassadorEntity> ambassadors = ambassadorRepository.findAllByUser(user);
+        List<Long> eventIds = ambassadors.stream().map(ambassador -> ambassador.getEvent().getId()).toList();
+
+        List<EventEntity> events;
+        if(isValid)
+            events = eventRepository.findAllByIdIn(eventIds)
+                    .stream()
+                    .filter(event -> event.getEndAt().isAfter(LocalDate.now()))
+                    .toList();
+        else
+            events = eventRepository.findAllByIdIn(eventIds)
+                    .stream()
+                    .filter(event -> event.getEndAt().isBefore(LocalDate.now()))
+                    .toList();
+
+        return events.stream()
+                .map(EventDto::from)
+                .toList();
     }
 }
