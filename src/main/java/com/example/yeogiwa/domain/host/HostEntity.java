@@ -8,7 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,7 +21,10 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
+@SQLDelete(sql = "UPDATE host SET is_deleted = true WHERE host_id = ?")
+@SQLRestriction("is_deleted = false")
 @Table(name = "host")
 public class HostEntity {
     /* Keys */
@@ -36,8 +42,11 @@ public class HostEntity {
     private String name;
 
     @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false, insertable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Builder.Default
+    private Boolean isDeleted = false;
 
     /* Related */
     @OneToMany(mappedBy = "host")

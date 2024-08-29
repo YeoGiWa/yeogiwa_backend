@@ -3,6 +3,8 @@ package com.example.yeogiwa.domain.event;
 import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
 import com.example.yeogiwa.domain.ambassador.AmbassadorRepository;
 import com.example.yeogiwa.domain.event.dto.*;
+import com.example.yeogiwa.domain.host.HostEntity;
+import com.example.yeogiwa.domain.host.HostRepository;
 import com.example.yeogiwa.domain.user.UserEntity;
 import com.example.yeogiwa.domain.user.UserRepository;
 import com.example.yeogiwa.enums.Region;
@@ -12,6 +14,7 @@ import com.example.yeogiwa.openapi.dto.FestivalDto;
 import com.example.yeogiwa.openapi.dto.FestivalIntroDto;
 import com.example.yeogiwa.openapi.OpenApiService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,7 @@ public class EventService {
     private final OpenApiService openApiService;
     private final UserRepository userRepository;
     private final AmbassadorRepository ambassadorRepository;
+    private final HostRepository hostRepository;
     private final EventRepository eventRepository;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -259,4 +263,19 @@ public class EventService {
                 .map(EventDto::from)
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<EventDto> listEventsByHost(String email) {
+        UserEntity user = userRepository.findByEmail(email);
+        HostEntity host = hostRepository.findByUser(user)
+            .orElseThrow(() -> new IllegalArgumentException("호스트로 등록되지 않은 유저입니다."));
+
+        PageRequest pageable = PageRequest.of(0, 10, Sort.by("createAt").descending());
+        Page<EventEntity> events = eventRepository.findAllByHost(pageable, host);
+
+        return events.stream()
+                .map(EventDto::from)
+                .toList();
+    }
+
 }
