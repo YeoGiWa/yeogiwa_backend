@@ -5,14 +5,14 @@ import com.example.yeogiwa.domain.fund.FundEntity;
 import com.example.yeogiwa.domain.host.HostEntity;
 import com.example.yeogiwa.domain.promoted.PromotedEntity;
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,13 +20,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static jakarta.persistence.CascadeType.REMOVE;
+import static jakarta.persistence.FetchType.LAZY;
+
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@SQLDelete(sql = "UPDATE event SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE event SET is_deleted = true WHERE event_id = ?")
 @SQLRestriction("is_deleted = false")
 @Table(name = "event")
 public class EventEntity {
@@ -35,7 +38,7 @@ public class EventEntity {
     @Column(name = "event_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "host_id")
     private HostEntity host;
 
@@ -76,4 +79,8 @@ public class EventEntity {
     @OneToMany(mappedBy = "event")
     @Builder.Default
     private List<FundEntity> funds = new ArrayList<>();
+
+    @OneToMany(mappedBy = "event")
+    @Builder.Default
+    private List<SessionEntity> sessions = new ArrayList<>();
 }

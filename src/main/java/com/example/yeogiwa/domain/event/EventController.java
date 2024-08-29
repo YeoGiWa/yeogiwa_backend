@@ -1,11 +1,8 @@
 package com.example.yeogiwa.domain.event;
 
-import com.example.yeogiwa.domain.event.dto.EventDto;
-import com.example.yeogiwa.domain.event.dto.UpdateEventRequest;
+import com.example.yeogiwa.domain.event.dto.*;
 import com.example.yeogiwa.enums.Region;
 import com.example.yeogiwa.enums.EventSort;
-import com.example.yeogiwa.domain.event.dto.CreateEventRequest;
-import com.example.yeogiwa.domain.event.dto.GetEventResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -21,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/events")
@@ -28,6 +26,7 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
+    private final SessionService sessionService;
 
     @Operation(summary = "특정 이벤트 정보 조회", description = "특정 이벤트의 상세 정보를 반환")
     @ApiResponses(value = {
@@ -66,8 +65,12 @@ public class EventController {
         @Parameter(description = "축제의 종료 날짜입니다. 단독으로 보낼 수 없습니다. yyyymmdd 형식으로 보내주세요.") @RequestParam(name = "eventEndDate", required = false) String eventEndDate,
         @Parameter(description = "[필수] 축제의 활성화 여부입니다. false는 전체 조회입니다.") @RequestParam(name = "isValid") Boolean isValid
     ) {
-        if (eventStartDate == null || eventStartDate.length() != 8 || (eventEndDate != null && eventEndDate.length() != 8) || (eventEndDate != null && eventStartDate.compareTo(eventEndDate) > 0)) {
+        if ((eventStartDate != null && eventStartDate.length() != 8) || (eventEndDate != null && eventEndDate.length() != 8) || (eventEndDate != null && eventStartDate == null) || (eventEndDate != null && eventStartDate.compareTo(eventEndDate) > 0)) {
             return ResponseEntity.status(400).body(null);
+        }
+
+        if (eventStartDate == null) {
+            eventStartDate = "19000101";
         }
 
         List<GetEventResponse> event = eventService.listEvents(numOfRows, pageNo, region, eventStartDate, eventEndDate, isValid);
@@ -146,5 +149,51 @@ public class EventController {
     public void deleteEvent(@PathVariable("id") String id) {
         // TODO: 관리자만 삭제 가능하도록 수정
         eventService.deleteEvent(id);
+    }
+
+    @Operation(summary = "회차 추가", description = "관리자가 등록한 축제에 회차 추가하기")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "회차를 정상적으로 생성", content = {
+            @Content(schema = @Schema(implementation = SessionEntity.class))
+        }),
+        @ApiResponse(responseCode = "400", description = "오류로 인해 회차를 생성하지 못함", content = {
+            @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))
+        })
+    })
+    @PostMapping("/session")
+    public ResponseEntity<SessionDto> createSession(@Valid @RequestBody CreateSessionRequest request) {
+        SessionDto session = sessionService.createSession(request);
+
+        return ResponseEntity.status(200).body(session);
+    }
+
+    @Operation(summary = "회차 수정", description = "관리자가 등록한 축제의 회차 수정하기")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "회차를 정상적으로 수정", content = {
+            @Content(schema = @Schema(implementation = EventDto.class))
+        }),
+        @ApiResponse(responseCode = "400", description = "오류로 인해 회차를 수정하지 못함", content = {
+            @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))
+        })
+    })
+    @PutMapping("/session/{id}")
+    public ResponseEntity<SessionDto> updateSession(@PathVariable("id") UUID id, @Valid @RequestBody UpdateSessionRequest request) {
+        SessionDto session = sessionService.updateSession(id, request);
+
+        return ResponseEntity.status(200).body(session);
+    }
+
+    @Operation(summary = "회차 삭제", description = "관리자가 등록한 축제의 회차 삭제하기")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "회차를 정상적으로 삭제", content = {
+            @Content(schema = @Schema(implementation = EventDto.class))
+        }),
+        @ApiResponse(responseCode = "400", description = "오류로 인해 회차를 삭제하지 못함", content = {
+            @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))
+        })
+    })
+    @DeleteMapping("/session/{id}")
+    public void deleteSession(@PathVariable("id") UUID id) {
+        sessionService.deleteSession(id);
     }
 }

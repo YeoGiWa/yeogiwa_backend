@@ -1,5 +1,6 @@
 package com.example.yeogiwa.domain.event.dto;
 
+import com.example.yeogiwa.domain.event.SessionEntity;
 import com.example.yeogiwa.openapi.dto.FestivalInfoDto;
 import com.example.yeogiwa.openapi.dto.FestivalImageDto;
 import com.example.yeogiwa.openapi.dto.FestivalDto;
@@ -7,6 +8,7 @@ import com.example.yeogiwa.openapi.dto.FestivalIntroDto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.Session;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,9 +28,10 @@ public class GetEventResponse {
     private LocalDate endAt;
     private Boolean isValid;
     private LocalDateTime createdAt;
+    private List<SessionDto> sessionEntities;
 
 
-    public GetEventResponse(FestivalDto festivalDto, FestivalIntroDto festivalIntroDto, List<FestivalInfoDto> festivalInfoDtos, List<FestivalImageDto> festivalImageDtos, Integer ratio, LocalDate startAt, LocalDate endAt, Boolean isValid, LocalDateTime createdAt) {
+    public GetEventResponse(FestivalDto festivalDto, FestivalIntroDto festivalIntroDto, List<FestivalInfoDto> festivalInfoDtos, List<FestivalImageDto> festivalImageDtos, Integer ratio, LocalDate startAt, LocalDate endAt, Boolean isValid, LocalDateTime createdAt, List<SessionDto> sessionEntities) {
         this.festivalDto = festivalDto;
         this.festivalIntroDto = festivalIntroDto;
         this.festivalInfoDtos = festivalInfoDtos;
@@ -38,5 +41,6 @@ public class GetEventResponse {
         this.endAt = endAt;
         this.isValid = isValid;
         this.createdAt = createdAt;
+        this.sessionEntities = sessionEntities;
     }
 }
