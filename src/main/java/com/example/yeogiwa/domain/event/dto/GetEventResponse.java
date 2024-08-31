@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -24,10 +25,10 @@ public class GetEventResponse {
     private LocalDate startAt;
     private LocalDate endAt;
     private Boolean isValid;
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
 
-    public GetEventResponse(FestivalDto festivalDto, FestivalIntroDto festivalIntroDto, List<FestivalInfoDto> festivalInfoDtos, List<FestivalImageDto> festivalImageDtos, Integer ratio, LocalDate startAt, LocalDate endAt, Boolean isValid, Date createdAt) {
+    public GetEventResponse(FestivalDto festivalDto, FestivalIntroDto festivalIntroDto, List<FestivalInfoDto> festivalInfoDtos, List<FestivalImageDto> festivalImageDtos, Integer ratio, LocalDate startAt, LocalDate endAt, Boolean isValid, LocalDateTime createdAt) {
         this.festivalDto = festivalDto;
         this.festivalIntroDto = festivalIntroDto;
         this.festivalInfoDtos = festivalInfoDtos;
