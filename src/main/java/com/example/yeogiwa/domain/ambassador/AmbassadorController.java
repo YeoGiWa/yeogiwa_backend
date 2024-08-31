@@ -47,7 +47,7 @@ public class AmbassadorController {
             @ApiResponse(responseCode = "400", description = "오류가 발생해 행사/축제의 앰배서더 목록을 조회하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 행사/축제인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
     })
-    public ResponseEntity<List<AmbassadorDto>> getAmbassadorList(@Parameter(description = "[필수] 앰버서더를 조회할 행사의 ID입니다.") @RequestParam(name = "eventId", defaultValue = "12345678") String eventId) {
+    public ResponseEntity<List<AmbassadorDto>> getAmbassadorList(@Parameter(description = "앰버서더를 조회할 행사의 ID입니다.", example = "12345678") @RequestParam(name = "eventId", defaultValue = "12345678") String eventId) {
         List<AmbassadorDto> ambassadors = ambassadorService.listAmbassadorsByEvent(eventId);
 
         return ResponseEntity.status(200).body(ambassadors);

@@ -60,12 +60,12 @@ public class EventController {
     })
     @GetMapping("/list")
     public ResponseEntity<List<GetEventResponse>> listEvents(
-        @Parameter(description = "[필수] 페이지에 보여줄 결과의 갯수 입니다. 기본 값은 10입니다.") @RequestParam(name = "numOfRows", defaultValue = "10") int numOfRows,
-        @Parameter(description = "[필수] 페이지 번호입니다. 1부터 시작합니다.") @RequestParam("pageNo") int pageNo,
-        @Parameter(description = "[필수] 조회할 축제의 지역입니다.") @RequestParam("region") Region region,
-        @Parameter(description = "축제의 시작 날짜입니다. yyyymmdd 형식으로 보내주세요.") @RequestParam(name = "eventStartDate", required = false) String eventStartDate,
-        @Parameter(description = "축제의 종료 날짜입니다. 단독으로 보낼 수 없습니다. yyyymmdd 형식으로 보내주세요.") @RequestParam(name = "eventEndDate", required = false) String eventEndDate,
-        @Parameter(description = "[필수] 축제의 활성화 여부입니다. false는 전체 조회입니다.") @RequestParam(name = "isValid") Boolean isValid
+        @Parameter(description = "페이지에 보여줄 결과의 갯수 입니다. 기본 값은 10입니다.", example = "10") @RequestParam(name = "numOfRows", defaultValue = "10") int numOfRows,
+        @Parameter(description = "페이지 번호입니다. 1부터 시작합니다.", example = "1") @RequestParam("pageNo") int pageNo,
+        @Parameter(description = "조회할 축제의 지역입니다.", example = "ALL") @RequestParam("region") Region region,
+        @Parameter(description = "축제의 시작 날짜입니다. yyyymmdd 형식으로 보내주세요.", example = "20240101") @RequestParam(name = "eventStartDate", required = false) String eventStartDate,
+        @Parameter(description = "축제의 종료 날짜입니다. 단독으로 보낼 수 없습니다. yyyymmdd 형식으로 보내주세요.", example = "20241231") @RequestParam(name = "eventEndDate", required = false) String eventEndDate,
+        @Parameter(description = "축제의 활성화 여부입니다. false는 전체 조회입니다.", example = "true") @RequestParam(name = "isValid") Boolean isValid
     ) {
         if ((eventStartDate != null && eventStartDate.length() != 8) || (eventEndDate != null && eventEndDate.length() != 8) || (eventEndDate != null && eventStartDate == null) || (eventEndDate != null && eventStartDate.compareTo(eventEndDate) > 0)) {
             return ResponseEntity.status(400).body(null);
@@ -91,11 +91,11 @@ public class EventController {
     })
     @GetMapping("/nearby")
     public ResponseEntity<List<GetEventResponse>> listEventsNearby(
-        @Parameter(description = "[필수] 페이지에 보여줄 결과의 갯수 입니다. 기본 값은 10입니다.") @RequestParam(name = "numOfRows", defaultValue = "10") int numOfRows,
-        @Parameter(description = "[필수] 페이지 번호입니다. 1부터 시작합니다.") @RequestParam("pageNo") int pageNo,
-        @Parameter(description = "[필수] 검색할 지도의 경도입니다. xxx.xxxxxx 형식으로 보내주세요.") @RequestParam("mapX") String mapX,
-        @Parameter(description = "[필수] 검색할 지도의 위도입니다. xxx.xxxxxx 형식으로 보내주세요.") @RequestParam("mapY") String mapY,
-        @Parameter(description = "[필수] 검색할 지도의 범위입니다. m 단위로 보내주세요.") @RequestParam("radius") String radius
+        @Parameter(description = "페이지에 보여줄 결과의 갯수 입니다. 기본 값은 10입니다.", example = "10") @RequestParam(name = "numOfRows", defaultValue = "10") int numOfRows,
+        @Parameter(description = "페이지 번호입니다. 1부터 시작합니다.", example = "1") @RequestParam("pageNo") int pageNo,
+        @Parameter(description = "검색할 지도의 경도입니다. xxx.xxxxxx 형식으로 보내주세요.", example = "127.12345") @RequestParam("mapX") String mapX,
+        @Parameter(description = "검색할 지도의 위도입니다. xxx.xxxxxx 형식으로 보내주세요.", example = "37.12345") @RequestParam("mapY") String mapY,
+        @Parameter(description = "검색할 지도의 범위입니다. m 단위로 보내주세요. 최대 20000m 입니다.", example = "20000") @RequestParam("radius") String radius
     ) {
         List<GetEventResponse> event = eventService.listEventsNearby(numOfRows, pageNo, mapX, mapY, radius);
 
@@ -207,7 +207,7 @@ public class EventController {
             @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 유저이거나 탈퇴한 유저인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
     })
-    public ResponseEntity<List<EventDto>> getUserAmbassadorList(@Parameter(description = "[필수] 진행중 여부입니다.") @RequestParam(name = "isValid") Boolean isValid) {
+    public ResponseEntity<List<EventDto>> getUserAmbassadorList(@Parameter(description = "진행중 여부입니다.", example = "true") @RequestParam(name = "isValid") Boolean isValid) {
         // TODO: 토큰에서 가져오기
         String email = "test@gmail.com";
 

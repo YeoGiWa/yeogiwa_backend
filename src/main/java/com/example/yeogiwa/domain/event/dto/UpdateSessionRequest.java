@@ -15,12 +15,12 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class UpdateSessionRequest {
-    @Schema(description = "[필수] 회차 카운트")
+    @Schema(description = "회차 카운트")
     private Integer count;
 
-    @Schema(description = "[필수] 회차의 행사 시작 날짜")
+    @Schema(description = "회차의 행사 시작 날짜")
     private LocalDate startDate;
 
-    @Schema(description = "[필수] 회차의 행사 시작 시간", type = "string", example = "12:00:00")
+    @Schema(description = "회차의 행사 시작 시간", type = "string", example = "12:00:00")
     private LocalTime startTime;
 }
