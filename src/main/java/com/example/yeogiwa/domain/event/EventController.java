@@ -2,7 +2,8 @@ package com.example.yeogiwa.domain.event;
 
 import com.example.yeogiwa.domain.event.dto.*;
 import com.example.yeogiwa.enums.Region;
-import com.example.yeogiwa.enums.EventSort;
+import com.example.yeogiwa.domain.event.dto.CreateEventRequest;
+import com.example.yeogiwa.domain.event.dto.GetEventResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -45,7 +46,7 @@ public class EventController {
     @GetMapping("/{id}")
     public ResponseEntity<GetEventResponse> getEventById(@Parameter(description = "행사 ID입니다.") @PathVariable("id") String id) {
         GetEventResponse event = eventService.getEventById(id);
-
+  
         return ResponseEntity.status(200).body(event);
     }
 
