@@ -1,7 +1,7 @@
 package com.example.yeogiwa.domain.user;
 
+import com.example.yeogiwa.auth.oauth.PrincipalDetails;
 import com.example.yeogiwa.domain.user.dto.RegisterDTO;
-import com.example.yeogiwa.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,7 +32,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "이미 탈퇴한 유저인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
     })
     public ResponseEntity<UserEntity> getUser(Authentication authentication) {
-        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
         return ResponseEntity.status(200).body(userService.getUser(user.getUsername()));
     }
 
@@ -43,7 +43,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "에러가 발생해 유저를 생성하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
             @ApiResponse(responseCode = "409", description = "해당 이메일로 이미 가입된 유저가 존재하는 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Conflict.class)))
     })
-    public ResponseEntity<UUID> register(@RequestBody RegisterDTO registerDTO) {
+    public ResponseEntity<Long> register(@RequestBody RegisterDTO registerDTO) {
         return ResponseEntity.status(201).body(userService.createUser(registerDTO));
     }
 

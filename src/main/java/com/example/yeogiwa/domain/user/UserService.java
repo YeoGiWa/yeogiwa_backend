@@ -23,7 +23,7 @@ public class UserService {
         return null;
     }
 
-    public UUID createUser(RegisterDTO registerDTO) throws HttpClientErrorException {
+    public Long createUser(RegisterDTO registerDTO) throws HttpClientErrorException {
         String email = registerDTO.getEmail();
         String password = registerDTO.getPassword();
 

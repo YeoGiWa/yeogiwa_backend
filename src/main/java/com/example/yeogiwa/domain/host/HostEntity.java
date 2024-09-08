@@ -23,9 +23,9 @@ import java.util.UUID;
 public class HostEntity {
     /* Keys */
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "host_id")
-    private UUID id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
