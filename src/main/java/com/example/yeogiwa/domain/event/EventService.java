@@ -1,10 +1,13 @@
 package com.example.yeogiwa.domain.event;
 
+import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
+import com.example.yeogiwa.domain.ambassador.AmbassadorRepository;
+import com.example.yeogiwa.domain.event.dto.*;
+import com.example.yeogiwa.domain.host.HostEntity;
+import com.example.yeogiwa.domain.host.HostRepository;
+import com.example.yeogiwa.domain.user.UserEntity;
+import com.example.yeogiwa.domain.user.UserRepository;
 import com.example.yeogiwa.enums.Region;
-import com.example.yeogiwa.domain.event.dto.CreateEventRequest;
-import com.example.yeogiwa.domain.event.dto.UpdateEventRequest;
-import com.example.yeogiwa.domain.event.dto.GetEventResponse;
-import com.example.yeogiwa.domain.event.dto.EventDto;
 import com.example.yeogiwa.openapi.dto.FestivalInfoDto;
 import com.example.yeogiwa.openapi.dto.FestivalImageDto;
 import com.example.yeogiwa.openapi.dto.FestivalDto;
@@ -23,15 +26,20 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class EventService {
     private final OpenApiService openApiService;
+    private final UserRepository userRepository;
+    private final AmbassadorRepository ambassadorRepository;
+    private final HostRepository hostRepository;
     private final EventRepository eventRepository;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
+    @Transactional(readOnly = true)
     public GetEventResponse getEventById(String id) {
         FestivalDto festivalDto = openApiService.getFestivalDetail(id);
         FestivalIntroDto festivalIntroDto = openApiService.getFestivalDetailIntro(id);
@@ -44,12 +52,32 @@ public class EventService {
         LocalDate endAt = LocalDate.parse(festivalIntroDto.getEventenddate(), formatter);
         Boolean isValid = startAt.isBefore(LocalDate.now()) && endAt.isAfter(LocalDate.now());
 
-        return event.map(eventEntity ->
-            new GetEventResponse(festivalDto, festivalIntroDto, festivalInfoDtos, festivalImageDtos, eventEntity.getRatio(), eventEntity.getStartAt(), eventEntity.getEndAt(), isValid, eventEntity.getCreatedAt()))
-            .orElseGet(() ->
-                new GetEventResponse(festivalDto, festivalIntroDto, festivalInfoDtos, festivalImageDtos, null, LocalDate.parse(festivalIntroDto.getEventstartdate(), formatter), LocalDate.parse(festivalIntroDto.getEventenddate(), formatter), isValid, null));
+        return event.map(eventEntity -> {
+            List<SessionDto> sessionDtos = eventEntity.getSessions().stream()
+                    .map(SessionDto::from)
+                    .collect(Collectors.toList());
+
+            return new GetEventResponse(
+                    festivalDto,
+                    festivalIntroDto,
+                    festivalInfoDtos,
+                    festivalImageDtos,
+                    EventDto.from(eventEntity),
+                    isValid
+            );
+        }).orElseGet(() ->
+                new GetEventResponse(
+                        festivalDto,
+                        festivalIntroDto,
+                        festivalInfoDtos,
+                        festivalImageDtos,
+                        null,
+                        isValid
+                )
+        );
     }
 
+    @Transactional(readOnly = true)
     public List<GetEventResponse> listEvents(int numOfRows, int pageNo, Region region, String eventStartDate, String eventEndDate, Boolean isValid) {
         HashMap<Long, EventEntity> eventMap;
         if (isValid) {
@@ -66,6 +94,9 @@ public class EventService {
                             .stream()
                             .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
                 else {
+                    if(eventEndDate == null)
+                        eventEndDate = "20991231";
+
                     assert eventStartDate != null;
                     if(region != Region.ALL)
                         eventMap = eventRepository.findAllByStartAtBetweenAndRegionOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.of(2099, 12, 31), region.code)
@@ -96,7 +127,11 @@ public class EventService {
                         .addr1(eventEntity.getPlace())
                         .build();
 
-                    return new GetEventResponse(festivalDto, null, null, null, eventEntity.getRatio(), eventEntity.getStartAt(), eventEntity.getEndAt(), true, eventEntity.getCreatedAt());
+                    List<SessionDto> sessionDtos = eventEntity.getSessions().stream()
+                        .map(SessionDto::from)  // SessionDto.of(entity) 사용하여 변환
+                        .toList();
+
+                    return new GetEventResponse(festivalDto, null, null, null, EventDto.from(eventEntity), true);
                 })
                 .toList();
         } else {
@@ -117,15 +152,20 @@ public class EventService {
 
                     Boolean isValid1 = event.map(eventEntity -> eventEntity.getStartAt().isBefore(LocalDate.now()) && eventEntity.getEndAt().isAfter(LocalDate.now())).orElse(false);
 
-                    return event.map(eventEntity ->
-                            new GetEventResponse(festival, null, null, null, null, eventEntity.getStartAt(), eventEntity.getEndAt(), isValid1, eventEntity.getCreatedAt()))
-                        .orElseGet(() ->
-                            new GetEventResponse(festival, null, null, null, null, null, null, false, null));
+                    return event.map(eventEntity -> {
+                        List<SessionDto> sessionDtos = eventEntity.getSessions().stream()
+                            .map(SessionDto::from)
+                            .toList();
+
+                        return new GetEventResponse(festival, null, null, null, EventDto.from(eventEntity), isValid1);
+                    }).orElseGet(() ->
+                        new GetEventResponse(festival, null, null, null, null, false));
                 })
                 .toList();
         }
     }
 
+    @Transactional(readOnly = true)
     public List<GetEventResponse> listEventsNearby(int numOfRows, int pageNo, String mapX, String mapY, String radius) {
         List<FestivalDto> festivals = openApiService.listNearbyFestival(numOfRows, pageNo, mapX, mapY, radius);
 
@@ -142,12 +182,16 @@ public class EventService {
             .map(festival -> {
                 Optional<EventEntity> event = Optional.ofNullable(eventMap.get(festival.getContentid()));
 
-                Optional<Boolean> isValid = event.map(eventEntity -> eventEntity.getStartAt().isBefore(LocalDate.now()) && eventEntity.getEndAt().isAfter(LocalDate.now()));
+                Boolean isValid1 = event.map(eventEntity -> eventEntity.getStartAt().isBefore(LocalDate.now()) && eventEntity.getEndAt().isAfter(LocalDate.now())).orElse(false);
 
-                return event.map(eventEntity ->
-                    new GetEventResponse(festival, null, null, null, null, eventEntity.getStartAt(), eventEntity.getEndAt(), isValid.get(), eventEntity.getCreatedAt()))
-                    .orElseGet(() ->
-                        new GetEventResponse(festival, null, null, null, null, null, null, null, null));
+                return event.map(eventEntity -> {
+                    List<SessionDto> sessionDtos = eventEntity.getSessions().stream()
+                        .map(SessionDto::from)
+                        .toList();
+
+                    return new GetEventResponse(festival, null, null, null, EventDto.from(eventEntity), isValid1);
+                }).orElseGet(() ->
+                        new GetEventResponse(festival, null, null, null, null, false));
             })
             .toList();
     }
@@ -196,4 +240,42 @@ public class EventService {
 
         eventRepository.delete(event);
     }
+
+    @Transactional(readOnly = true)
+    public List<EventDto> listEventsByAmbassador(String email, Boolean isValid) {
+        UserEntity user = userRepository.findByEmail(email);
+        List<AmbassadorEntity> ambassadors = ambassadorRepository.findAllByUser(user);
+        List<Long> eventIds = ambassadors.stream().map(ambassador -> ambassador.getEvent().getId()).toList();
+
+        List<EventEntity> events;
+        if(isValid)
+            events = eventRepository.findAllByIdIn(eventIds)
+                    .stream()
+                    .filter(event -> event.getEndAt().isAfter(LocalDate.now()))
+                    .toList();
+        else
+            events = eventRepository.findAllByIdIn(eventIds)
+                    .stream()
+                    .filter(event -> event.getEndAt().isBefore(LocalDate.now()))
+                    .toList();
+
+        return events.stream()
+                .map(EventDto::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<EventDto> listEventsByHost(String email) {
+        UserEntity user = userRepository.findByEmail(email);
+        HostEntity host = hostRepository.findByUser(user)
+            .orElseThrow(() -> new IllegalArgumentException("호스트로 등록되지 않은 유저입니다."));
+
+        PageRequest pageable = PageRequest.of(0, 10, Sort.by("createAt").descending());
+        Page<EventEntity> events = eventRepository.findAllByHost(pageable, host);
+
+        return events.stream()
+                .map(EventDto::from)
+                .toList();
+    }
+
 }

@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.NonNull;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,8 +51,7 @@ public class UserEntity {
     private Role role = Role.ROLE_USER;
 
     @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @Column(nullable = false, insertable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     @Builder.Default
