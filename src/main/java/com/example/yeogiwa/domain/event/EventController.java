@@ -1,9 +1,7 @@
 package com.example.yeogiwa.domain.event;
 
-import com.example.yeogiwa.domain.event.dto.EventDto;
-import com.example.yeogiwa.domain.event.dto.UpdateEventRequest;
+import com.example.yeogiwa.domain.event.dto.*;
 import com.example.yeogiwa.enums.Region;
-import com.example.yeogiwa.enums.EventSort;
 import com.example.yeogiwa.domain.event.dto.CreateEventRequest;
 import com.example.yeogiwa.domain.event.dto.GetEventResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +20,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/events")
 @RequiredArgsConstructor
+@Tag(name = "🎆 이벤트 API", description = "이벤트 관련 API")
 public class EventController {
 
     private final EventService eventService;
+    private final SessionService sessionService;
 
     @Operation(summary = "특정 이벤트 정보 조회", description = "특정 이벤트의 상세 정보를 반환")
     @ApiResponses(value = {
@@ -66,8 +68,12 @@ public class EventController {
         @Parameter(description = "축제의 종료 날짜입니다. 단독으로 보낼 수 없습니다. yyyymmdd 형식으로 보내주세요.", example = "20241231") @RequestParam(name = "eventEndDate", required = false) String eventEndDate,
         @Parameter(description = "축제의 활성화 여부입니다. false는 전체 조회입니다.", example = "true") @RequestParam(name = "isValid") Boolean isValid
     ) {
-        if (eventStartDate == null || eventStartDate.length() != 8 || (eventEndDate != null && eventEndDate.length() != 8) || (eventEndDate != null && eventStartDate.compareTo(eventEndDate) > 0)) {
+        if ((eventStartDate != null && eventStartDate.length() != 8) || (eventEndDate != null && eventEndDate.length() != 8) || (eventEndDate != null && eventStartDate == null) || (eventEndDate != null && eventStartDate.compareTo(eventEndDate) > 0)) {
             return ResponseEntity.status(400).body(null);
+        }
+
+        if (eventStartDate == null) {
+            eventStartDate = "19000101";
         }
 
         List<GetEventResponse> event = eventService.listEvents(numOfRows, pageNo, region, eventStartDate, eventEndDate, isValid);
@@ -146,5 +152,86 @@ public class EventController {
     public void deleteEvent(@PathVariable("id") String id) {
         // TODO: 관리자만 삭제 가능하도록 수정
         eventService.deleteEvent(id);
+    }
+
+    @Operation(summary = "회차 추가", description = "관리자가 등록한 축제에 회차 추가하기")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "회차를 정상적으로 생성", content = {
+            @Content(schema = @Schema(implementation = SessionEntity.class))
+        }),
+        @ApiResponse(responseCode = "400", description = "오류로 인해 회차를 생성하지 못함", content = {
+            @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))
+        })
+    })
+    @PostMapping("/sessions")
+    public ResponseEntity<SessionDto> createSession(@Valid @RequestBody CreateSessionRequest request) {
+        SessionDto session = sessionService.createSession(request);
+
+        return ResponseEntity.status(200).body(session);
+    }
+
+    @Operation(summary = "회차 수정", description = "관리자가 등록한 축제의 회차 수정하기")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "회차를 정상적으로 수정", content = {
+            @Content(schema = @Schema(implementation = EventDto.class))
+        }),
+        @ApiResponse(responseCode = "400", description = "오류로 인해 회차를 수정하지 못함", content = {
+            @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))
+        })
+    })
+    @PutMapping("/sessions/{id}")
+    public ResponseEntity<SessionDto> updateSession(@PathVariable("id") UUID id, @Valid @RequestBody UpdateSessionRequest request) {
+        SessionDto session = sessionService.updateSession(id, request);
+
+        return ResponseEntity.status(200).body(session);
+    }
+
+    @Operation(summary = "회차 삭제", description = "관리자가 등록한 축제의 회차 삭제하기")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "회차를 정상적으로 삭제", content = {
+            @Content(schema = @Schema(implementation = EventDto.class))
+        }),
+        @ApiResponse(responseCode = "400", description = "오류로 인해 회차를 삭제하지 못함", content = {
+            @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))
+        })
+    })
+    @DeleteMapping("/sessions/{id}")
+    public void deleteSession(@PathVariable("id") UUID id) {
+        sessionService.deleteSession(id);
+    }
+
+    @GetMapping("/ambassadors")
+    @Operation(summary = "앰배서더 홍보 목록 조회", description = "해당 유저가 홍보하고 있는 행사/축제 목록 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유저가 홍보중인 행사/축제 목록을 성공적으로 조회한 경우", content = @Content(schema = @Schema(implementation = EventDto.class))),
+            @ApiResponse(responseCode = "400", description = "오류가 발생해 유저가 홍보중인 행사/축제 목록을 조회하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
+            @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저이거나 탈퇴한 유저인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
+    })
+    public ResponseEntity<List<EventDto>> getUserAmbassadorList(@Parameter(description = "진행중 여부입니다.", example = "true") @RequestParam(name = "isValid") Boolean isValid) {
+        // TODO: 토큰에서 가져오기
+        String email = "test@gmail.com";
+
+        List<EventDto> events = eventService.listEventsByAmbassador(email, isValid);
+
+        return ResponseEntity.status(200).body(events);
+    }
+    
+    @GetMapping("/hosts")
+    @Operation(summary = "호스트의 행사 목록 조회", description = "호스트가 등록한 행사/축제 목록 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "호스트가 등록한 행사/축제 목록을 성공적으로 조회한 경우", content = @Content(schema = @Schema(implementation = EventDto.class))),
+            @ApiResponse(responseCode = "400", description = "오류가 발생해 호스트가 등록한 행사/축제 목록을 조회하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
+            @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 호스트인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
+    })
+    public ResponseEntity<List<EventDto>> getHostEventList() {
+        // TODO: 권한 검증하기
+        // TODO: 토큰에서 가져오기
+        String email = "test@gmail.com";
+
+        List<EventDto> events = eventService.listEventsByHost(email);
+
+        return ResponseEntity.status(200).body(events);
     }
 }

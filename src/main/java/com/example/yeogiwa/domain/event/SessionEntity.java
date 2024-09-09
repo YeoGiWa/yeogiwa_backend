@@ -1,22 +1,18 @@
-package com.example.yeogiwa.domain.ambassador;
+package com.example.yeogiwa.domain.event;
 
+import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
+import com.example.yeogiwa.domain.fund.FundEntity;
+import com.example.yeogiwa.domain.host.HostEntity;
 import com.example.yeogiwa.domain.promoted.PromotedEntity;
-import com.example.yeogiwa.domain.user.UserEntity;
-import com.example.yeogiwa.domain.event.EventEntity;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-import org.springframework.lang.NonNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,29 +22,25 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@SQLDelete(sql = "UPDATE event SET is_deleted = true WHERE ambassador_id = ?")
+@SQLDelete(sql = "UPDATE session SET is_deleted = true WHERE session_id = ?")
 @SQLRestriction("is_deleted = false")
-@Table(name = "ambassador")
-public class AmbassadorEntity {
-
+@Table(name = "session")
+public class SessionEntity {
     /* Keys */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "ambassador_id")
+    @Column(name = "session_id")
     private UUID id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     private EventEntity event;
 
-    /* Columns */
-    @NonNull
-    @Column(nullable = false)
-    private String qr;
+    private Integer count;
+
+    private LocalDate startDate;
+
+    private LocalTime startTime;
 
     @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
@@ -56,9 +48,4 @@ public class AmbassadorEntity {
     @Column(nullable = false, insertable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     @Builder.Default
     private Boolean isDeleted = false;
-
-    /* Related */
-    @OneToMany(mappedBy = "ambassador")
-    @Builder.Default
-    private List<PromotedEntity> promotes = new ArrayList<>();
 }

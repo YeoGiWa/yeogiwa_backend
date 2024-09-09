@@ -59,7 +59,7 @@ public class JwtUtil {
 
     public Claims parseClaims(String token) {
         try {
-            return Jwts.parser().decryptWith(key).build().parseSignedClaims(token).getPayload();
+            return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }

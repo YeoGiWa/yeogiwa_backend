@@ -10,8 +10,12 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.lang.NonNull;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,6 +26,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
+@SQLDelete(sql = "UPDATE user SET is_deleted = true WHERE user_id = ?")
+@SQLRestriction("is_deleted = false")
 @Table(name = "user")
 public class UserEntity {
 
@@ -52,8 +58,7 @@ public class UserEntity {
     private Role role = Role.USER;
 
     @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @Column(nullable = false, insertable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     @Builder.Default

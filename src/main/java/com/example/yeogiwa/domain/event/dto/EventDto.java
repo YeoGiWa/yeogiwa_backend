@@ -6,8 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -16,15 +18,23 @@ import java.util.Date;
 public class EventDto {
     private Long id;
 
-//    private HostEntity host;
-
     private String name;
 
     private String place;
 
     private int ratio;
 
+    private LocalDate startAt;
+
+    private LocalDate endAt;
+
+    private String imageUrl;
+
+    private String region;
+
     private LocalDateTime createdAt;
+
+    private List<SessionDto> sessions;
 
 //    private List<AmbassadorEntity> ambassadors = new ArrayList<>();
 //
@@ -34,12 +44,21 @@ public class EventDto {
 
 
     public static EventDto from(EventEntity event) {
+        List<SessionDto> sessions = event.getSessions().stream()
+            .map(SessionDto::from)
+            .toList();
+
         return EventDto.builder()
             .id(event.getId())
             .name(event.getName())
             .place(event.getPlace())
             .ratio(event.getRatio())
+            .startAt(event.getStartAt())
+            .endAt(event.getEndAt())
+            .imageUrl(event.getImageUrl())
+            .region(event.getRegion())
             .createdAt(event.getCreatedAt())
+            .sessions(sessions)
             .build();
     }
 }

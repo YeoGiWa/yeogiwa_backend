@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -47,8 +48,17 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        Long id = jwtUtil.getId(accessToken);
-        UserEntity user = userRepository.findById(id).get();
+        String token = jwtUtil.substringToken(accessToken);
+        if (token==null) { return; }
+        Long id = jwtUtil.getId(token);
+
+        UserEntity user = null;
+        try {
+            user = userRepository.findById(id).get();
+        } catch (NoSuchElementException e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
         if (user == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
@@ -63,7 +73,7 @@ public class JwtFilter extends OncePerRequestFilter {
 //        );
 
         PrincipalDetails principal = new PrincipalDetails(user, null);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(principal, accessToken, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(request, response);
     }
