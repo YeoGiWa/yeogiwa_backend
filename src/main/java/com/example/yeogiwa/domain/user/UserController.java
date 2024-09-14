@@ -1,7 +1,8 @@
 package com.example.yeogiwa.domain.user;
 
+import com.example.yeogiwa.auth.oauth.PrincipalDetails;
 import com.example.yeogiwa.domain.user.dto.RegisterDTO;
-import com.example.yeogiwa.security.CustomUserDetails;
+import com.example.yeogiwa.domain.user.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,11 +11,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -22,6 +25,7 @@ import java.util.UUID;
 @ResponseBody
 @RequiredArgsConstructor
 @Tag(name = "👤 유저 API", description = "유저 관련 API")
+@Slf4j
 public class UserController {
     private final UserService userService;
 
@@ -33,21 +37,24 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
             @ApiResponse(responseCode = "404", description = "이미 탈퇴한 유저인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
     })
-    public ResponseEntity<UserEntity> getUser(Authentication authentication) {
-        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
-        return ResponseEntity.status(200).body(userService.getUser(user.getUsername()));
+    public ResponseEntity<UserDto> getUser(Authentication authentication) {
+        PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
+        Optional<UserEntity> opUser = userService.getUser(user.getUserId());
+        UserDto userDto = UserDto.from(opUser);
+        log.info("optional User: {}", userDto);
+        return ResponseEntity.status(200).body(userDto);
     }
 
-    @PostMapping("/register")
-    @Operation(summary = "회원가입", description = "새로운 유저 생성")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "새로운 유저를 성공적으로 생성한 경우"),
-            @ApiResponse(responseCode = "400", description = "에러가 발생해 유저를 생성하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
-            @ApiResponse(responseCode = "409", description = "해당 이메일로 이미 가입된 유저가 존재하는 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Conflict.class)))
-    })
-    public ResponseEntity<UUID> register(@RequestBody RegisterDTO registerDTO) {
-        return ResponseEntity.status(201).body(userService.createUser(registerDTO));
-    }
+//    @PostMapping("/register")
+//    @Operation(summary = "회원가입", description = "새로운 유저 생성")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "201", description = "새로운 유저를 성공적으로 생성한 경우"),
+//            @ApiResponse(responseCode = "400", description = "에러가 발생해 유저를 생성하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
+//            @ApiResponse(responseCode = "409", description = "해당 이메일로 이미 가입된 유저가 존재하는 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Conflict.class)))
+//    })
+//    public ResponseEntity<Long> register(@RequestBody RegisterDTO registerDTO) {
+//        return ResponseEntity.status(201).body(userService.createUser(registerDTO));
+//    }
 
     @DeleteMapping("/")
     @Operation(summary = "유저 탈퇴", description = "해당 유저의 isDeleted를 true로 설정(실제로 삭제하지 않음)")
@@ -58,6 +65,8 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "이미 탈퇴한 유저인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
     })
     public ResponseEntity<Null> deleteUser(Authentication authentication) {
+        PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
+        userService.deleteUser(user.getUserId());
         return ResponseEntity.status(200).body(null);
     }
 }

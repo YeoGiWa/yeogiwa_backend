@@ -23,7 +23,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class HostDto {
-    private UUID id;
+    private Long id;
 
     private UserDto user;
 
