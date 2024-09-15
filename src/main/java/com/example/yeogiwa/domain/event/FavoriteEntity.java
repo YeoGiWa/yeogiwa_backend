@@ -18,11 +18,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
-@SQLDelete(sql = "UPDATE event SET is_deleted = true WHERE event_id = ?")
-@SQLRestriction("is_deleted = false")
 @Table(name = "favorite")
 public class FavoriteEntity {
-    /* Keys */
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "favorite_id")
@@ -33,11 +31,9 @@ public class FavoriteEntity {
     @JoinColumn(name = "host_id", nullable = false)
     private HostEntity host;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_id", nullable = false)
-    private EventEntity event;
+    @Column(name = "event_id", nullable = false)
+    private String eventId;
 
-    /* Columns */
-    @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 }
