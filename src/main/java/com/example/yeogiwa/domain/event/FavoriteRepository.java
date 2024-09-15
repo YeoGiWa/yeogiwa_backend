@@ -13,11 +13,11 @@ import java.util.UUID;
 
 public interface FavoriteRepository extends JpaRepository<FavoriteEntity, Long> {
 
-    List<FavoriteEntity> findByHostId(UUID hostId);
+    List<FavoriteEntity> findByUserId(UUID userId);
 
-    Optional<FavoriteEntity> findByHostIdAndEventId(UUID hostId, String eventId);
+    Optional<FavoriteEntity> findByUserIdAndEventId(UUID userId, String eventId);
 
     @Modifying
-    @Query("DELETE FROM FavoriteEntity f WHERE f.eventId = :eventId AND f.host.id = :hostId")
-    void deleteByHostIdAndEventId(@Param("hostId") UUID hostId, @Param("eventId") String eventId);
+    @Query("DELETE FROM FavoriteEntity f WHERE f.eventId = :eventId AND f.user.id = :userId")
+    void deleteByUserIdAndEventId(@Param("userId") UUID userId, @Param("eventId") String eventId);
 }

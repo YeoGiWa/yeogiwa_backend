@@ -1,6 +1,6 @@
 package com.example.yeogiwa.domain.event;
 
-import com.example.yeogiwa.domain.host.HostEntity;
+import com.example.yeogiwa.domain.user.UserEntity;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.Builder;
@@ -25,10 +25,9 @@ public class FavoriteEntity {
     @Column(name = "favorite_id")
     private Long id;
 
-    /* Foreign keys */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "host_id", nullable = false)
-    private HostEntity host;
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
     @Column(name = "event_id", nullable = false)
     private String eventId;

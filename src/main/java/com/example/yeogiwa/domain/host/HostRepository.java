@@ -8,6 +8,4 @@ import java.util.UUID;
 
 public interface HostRepository extends JpaRepository<HostEntity, Long> {
     Optional<HostEntity> findByUser(UserEntity user);
-
-    Optional<HostEntity> findById(UUID hostId);
 }
