@@ -8,22 +8,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@Transactional
+//@Transactional
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserEntity getUser(String email) {
-        if (userRepository.existsByEmail(email))
-            return userRepository.findByEmail(email);
-        return null;
+    @jakarta.transaction.Transactional
+    public Optional<UserEntity> getUser(Long id) {
+//        if (userRepository.existsByOauth2Id(email))
+            return userRepository.findById(id);
+//        return null;
     }
 
-    public UUID createUser(RegisterDTO registerDTO) throws HttpClientErrorException {
+    public Long createUser(RegisterDTO registerDTO) throws HttpClientErrorException {
         String email = registerDTO.getEmail();
         String password = registerDTO.getPassword();
 
@@ -38,5 +40,9 @@ public class UserService {
                 .build();
 
         return userRepository.save(user).getId();
+    }
+
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
     }
 }

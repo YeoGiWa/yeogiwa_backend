@@ -19,21 +19,47 @@ spring:
 
   jwt:
     secret: ${JWT_SECRET}
-    expiration-time: ${JWT_EXP_TIME}
+    accessTokenExpTime: ${JWT_ACC_EXP_TIME}
+    refreshTokenExpTime: ${JWT_REF_EXP_TIME}
+
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            scope:
+              - profile_nickname
+              - profile_image
+              - account_email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            authorization-grant-type: authorization_code
+            client-name: kakao
+            client-authentication-method: client_secret_post
+
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
 
 openapi:
   secret-key: ${OPENAPI_KEY}
 
 springdoc:
   swagger-ui:
-    enabled: true # 'true' in dev mode, 'false' in op mode
-    disable-swagger-default-url: true
     path: /api-docs
-  show-login-endpoint: true
+    enabled: true # 'true' in dev mode, 'false' in op mode
+    #    oauth2RedirectUrl: /login/oauth2/code/kakao
+    show-login-endpoint: true
+    show-oauth2-endpoints: true
+    enable-spring-security: true
 
 logging.level:
   root: INFO
   org:
-    springframework: WARN
+    springframework:
+      security: DEBUG
     hibernate.SQL: DEBUG
-  # org.hibernate.type: trace
