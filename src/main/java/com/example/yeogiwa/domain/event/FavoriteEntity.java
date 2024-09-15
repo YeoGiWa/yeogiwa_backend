@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
 
