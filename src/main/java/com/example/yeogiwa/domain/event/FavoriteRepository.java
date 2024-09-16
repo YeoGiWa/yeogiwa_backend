@@ -13,11 +13,11 @@ import java.util.UUID;
 
 public interface FavoriteRepository extends JpaRepository<FavoriteEntity, Long> {
 
-    List<FavoriteEntity> findByUserId(UUID userId);
+    List<FavoriteEntity> findByUserId(Long userId);
 
-    Optional<FavoriteEntity> findByUserIdAndEvent(UUID userId, EventEntity event);
+    Optional<FavoriteEntity> findByUserIdAndEvent(Long userId, EventEntity event);
 
     @Modifying
     @Query("DELETE FROM FavoriteEntity f WHERE f.event = :event AND f.user.id = :userId")
-    void deleteByUserIdAndEvent(@Param("userId") UUID userId, @Param("event") EventEntity event);
+    void deleteByUserIdAndEvent(@Param("userId") Long userId, @Param("event") EventEntity event);
 }

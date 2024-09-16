@@ -25,7 +25,7 @@ public class FavoriteController {
             @ApiResponse(responseCode = "404", description = "사용자 또는 이벤트를 찾을 수 없음")
     })
     @PostMapping("/add")
-    public FavoriteEntity addFavorite(@RequestParam UUID userId, @RequestParam String eventId) {
+    public FavoriteEntity addFavorite(@RequestParam Long userId, @RequestParam String eventId) {
         return favoriteService.addFavorite(userId, eventId);
     }
 
@@ -35,7 +35,7 @@ public class FavoriteController {
             @ApiResponse(responseCode = "404", description = "즐겨찾기를 찾을 수 없음")
     })
     @DeleteMapping("/remove")
-    public void removeFavorite(@RequestParam UUID userId, @RequestParam String eventId) {
+    public void removeFavorite(@RequestParam Long userId, @RequestParam String eventId) {
         favoriteService.removeFavorite(userId, eventId);
     }
 
@@ -45,7 +45,7 @@ public class FavoriteController {
             @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음")
     })
     @GetMapping("/user/{userId}")
-    public List<FavoriteEntity> getFavoritesByUser(@PathVariable UUID userId) {
+    public List<FavoriteEntity> getFavoritesByUser(@PathVariable Long userId) {
         return favoriteService.getFavoritesByUser(userId);
     }
 }

@@ -23,20 +23,17 @@ public class FavoriteService {
     private EventRepository eventRepository;
 
     @Transactional
-    public FavoriteEntity addFavorite(UUID userId, String eventId) {
+    public FavoriteEntity addFavorite(Long userId, String eventId) {
         EventEntity event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new IllegalArgumentException("Event not found with ID" ));
+                .orElseThrow(() -> new IllegalArgumentException("Event not found with ID"));
 
         Optional<FavoriteEntity> existingFavorite = favoriteRepository.findByUserIdAndEvent(userId, event);
-
         if (existingFavorite.isPresent()) {
             throw new IllegalArgumentException("This favorite already exists for the user");
         }
 
-        UserEntity user = userRepository.findById(userId);
-        if (user == null) {
-            throw new IllegalArgumentException("User not found with ID");
-        }
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID"));
 
         FavoriteEntity favorite = FavoriteEntity.builder()
                 .user(user)
@@ -47,16 +44,17 @@ public class FavoriteService {
     }
 
     @Transactional
-    public void removeFavorite(UUID userId, String eventId) {
+    public void removeFavorite(Long userId, String eventId) {
         EventEntity event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found with ID"));
 
         favoriteRepository.deleteByUserIdAndEvent(userId, event);
     }
 
-    public List<FavoriteEntity> getFavoritesByUser(UUID userId) {
+    public List<FavoriteEntity> getFavoritesByUser(Long userId) {
         return favoriteRepository.findByUserId(userId);
     }
 }
+
 
 
