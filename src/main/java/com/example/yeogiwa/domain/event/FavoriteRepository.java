@@ -1,6 +1,6 @@
 package com.example.yeogiwa.domain.event;
 
-import feign.Param;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,9 +15,9 @@ public interface FavoriteRepository extends JpaRepository<FavoriteEntity, Long> 
 
     List<FavoriteEntity> findByUserId(UUID userId);
 
-    Optional<FavoriteEntity> findByUserIdAndEventId(UUID userId, String eventId);
+    Optional<FavoriteEntity> findByUserIdAndEvent(UUID userId, EventEntity event);
 
     @Modifying
-    @Query("DELETE FROM FavoriteEntity f WHERE f.eventId = :eventId AND f.user.id = :userId")
-    void deleteByUserIdAndEventId(@Param("userId") UUID userId, @Param("eventId") String eventId);
+    @Query("DELETE FROM FavoriteEntity f WHERE f.event = :event AND f.user.id = :userId")
+    void deleteByUserIdAndEvent(@Param("userId") UUID userId, @Param("event") EventEntity event);
 }
