@@ -9,6 +9,7 @@ import com.example.yeogiwa.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -42,6 +43,10 @@ public class SecurityConfig {
         "/redis/**"
     };
 
+    public static String[] AllowedGetMethodURLsToPublic = {
+        "/events/**"
+    };
+
     public static String[] AllowedURLsToAdmin = {
 
     };
@@ -65,6 +70,7 @@ public class SecurityConfig {
             .addFilterBefore(new JwtFilter(jwtUtil, userRepository),
                 UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.GET, AllowedGetMethodURLsToPublic).permitAll()
                 .requestMatchers(AllowedURLsToPublic).permitAll()
                 .requestMatchers(AllowedURLsToAdmin).hasRole("ADMIN")
                 .anyRequest().authenticated()

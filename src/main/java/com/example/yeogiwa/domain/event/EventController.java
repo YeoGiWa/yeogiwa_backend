@@ -44,7 +44,7 @@ public class EventController {
         })
     })
     @GetMapping("/{id}")
-    public ResponseEntity<GetEventResponse> getEventById(@Parameter(description = "행사 ID입니다.") @PathVariable("id") String id) {
+    public ResponseEntity<GetEventResponse> getEventById(@Parameter(description = "행사 ID입니다.", example = "2541883") @PathVariable("id") String id) {
         GetEventResponse event = eventService.getEventById(id);
   
         return ResponseEntity.status(200).body(event);

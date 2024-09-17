@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor()
+@AllArgsConstructor
 public class FestivalDto {
     private String overview;
     private Long contentid;
