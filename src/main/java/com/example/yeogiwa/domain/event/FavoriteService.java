@@ -13,14 +13,17 @@ import java.util.UUID;
 @Service
 public class FavoriteService {
 
-    @Autowired
-    private FavoriteRepository favoriteRepository;
+    private final FavoriteRepository favoriteRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
+
+    public FavoriteService(FavoriteRepository favoriteRepository, UserRepository userRepository, EventRepository eventRepository) {
+        this.favoriteRepository = favoriteRepository;
+        this.userRepository = userRepository;
+        this.eventRepository = eventRepository;
+    }
 
     @Transactional
     public FavoriteEntity addFavorite(Long userId, String eventId) {
@@ -52,6 +55,7 @@ public class FavoriteService {
     }
 
     public List<FavoriteEntity> getFavoritesByUser(Long userId) {
+
         return favoriteRepository.findByUserId(userId);
     }
 }
