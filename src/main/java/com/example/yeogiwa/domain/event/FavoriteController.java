@@ -44,9 +44,20 @@ public class FavoriteController {
             @ApiResponse(responseCode = "200", description = "즐겨찾기 목록 조회 성공"),
             @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음")
     })
-    @GetMapping("/user/{userId}")
+    @GetMapping("/{userId}")
     public List<FavoriteEntity> getFavoritesByUser(@PathVariable Long userId) {
         return favoriteService.getFavoritesByUser(userId);
     }
+
+    @Operation(summary = "즐겨찾기 단일 조회", description = "사용자 ID를 받아 해당 사용자의 즐겨찾기 단일 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "즐겨찾기 단일 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음")
+    })
+    @GetMapping("/{userId}/event/{eventId}")
+    public FavoriteEntity getFavorite(@PathVariable Long userId, @PathVariable String eventId) {
+        return favoriteService.getFavorite(userId, eventId);
+    }
+
 }
 

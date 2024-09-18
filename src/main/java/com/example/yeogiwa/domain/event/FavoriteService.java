@@ -58,6 +58,16 @@ public class FavoriteService {
 
         return favoriteRepository.findByUserId(userId);
     }
+
+    @Transactional
+    public FavoriteEntity getFavorite(Long userId, String eventId) {
+        EventEntity event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found with ID"));
+
+        return favoriteRepository.findByUserIdAndEvent(userId, event)
+                .orElseThrow(() -> new IllegalArgumentException("Favorite not found for user and event"));
+    }
+
 }
 
 
