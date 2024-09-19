@@ -30,17 +30,21 @@ jobs:
         run: |
           case "${{ github.actor_id }}" in
             "${{ secrets.USER1_ID }}")
-              DB_PORT=${{ secrets.DB_PORT_USER1 }}
-            ;;
-            "${{ secrets.USER2_ID }}")
-              DB_PORT=${{ secrets.DB_PORT_USER2 }}
-            ;;
-            "${{ secrets.USER3_ID }}")
-              DB_PORT=${{ secrets.DB_PORT_USER3 }}
-            ;;
-            "${{ secrets.USER4_ID }}")
-              DB_PORT=${{ secrets.DB_PORT_USER4 }}
-            ;;
+                DIST_PORT=${{ secrets.DOCKER_PORT_USER1 }}
+                DB_PORT=${{ secrets.DB_PORT_USER1 }}
+              ;;
+              "${{ secrets.USER2_ID }}")
+                DIST_PORT=${{ secrets.DOCKER_PORT_USER2 }}
+                DB_PORT=${{ secrets.DB_PORT_USER2 }}
+              ;;
+              "${{ secrets.USER3_ID }}")
+                DIST_PORT=${{ secrets.DOCKER_PORT_USER3 }}
+                DB_PORT=${{ secrets.DB_PORT_USER3 }}
+              ;;
+              "${{ secrets.USER4_ID }}")
+                DIST_PORT=${{ secrets.DOCKER_PORT_USER4 }}
+                DB_PORT=${{ secrets.DB_PORT_USER4 }}
+              ;;
           esac
 
       - name: Setup env for application.yml
@@ -54,7 +58,9 @@ jobs:
           OPENAPI_KEY=${{ secrets.OPENAPI_KEY }}
           KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
           KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
+          SSL_SECRET=${{ secrets.SSL_SECRET }}
           DDL_AUTO=validate
+          echo -e "\n\nserver:\n  ssl:\n    key-store: classpath:ssl-key.p12\n    key-store-type: PKCS12\n    key-store-password: ${SSL_SECRET}\n  port: ${DIST_PORT}\n" >> ./src/main/resources/application.yml
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
@@ -121,4 +127,4 @@ jobs:
             ${{ secrets.PATH_TO_DOCKER }} pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:pr${{ github.event.number }}-${{ github.run_number }}
             ${{ secrets.PATH_TO_DOCKER }} stop ${{ secrets.DOCKER_CONTAINER_NAME }}${{ github.actor_id }}
             ${{ secrets.PATH_TO_DOCKER }} rm ${{ secrets.DOCKER_CONTAINER_NAME }}${{ github.actor_id }}
-            ${{ secrets.PATH_TO_DOCKER }} run -p ${DIST_PORT}:8080 --name ${{ secrets.DOCKER_CONTAINER_NAME }}${{ github.actor_id }} -e DB_HOST=${{ secrets.DB_HOST }} -e DB_PORT=${DB_PORT} -e DB_DB=${{ secrets.DB_DB }} -e DB_USER=${{ secrets.DB_USER }} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e JWT_SECRET=${{ secrets.JWT_SECRET }} -e JWT_EXP_TIME=${{ secrets.JWT_EXP_TIME }} -e OPENAPI_KEY=${{ secrets.OPENAPI_KEY }} -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} -e DDL_AUTO=validate -d ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:pr${{ github.event.number }}-${{ github.run_number }}
+            ${{ secrets.PATH_TO_DOCKER }} run -p ${DIST_PORT}:8080 --name ${{ secrets.DOCKER_CONTAINER_NAME }}${{ github.actor_id }} -e DB_HOST=${{ secrets.DB_HOST }} -e DB_PORT=${DB_PORT} -e DB_DB=${{ secrets.DB_DB }} -e DB_USER=${{ secrets.DB_USER }} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e JWT_SECRET=${{ secrets.JWT_SECRET }} -e JWT_EXP_TIME=${{ secrets.JWT_EXP_TIME }} -e OPENAPI_KEY=${{ secrets.OPENAPI_KEY }} -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} -e SSL_SECRET=${{ secrets.SSL_SECRET }} -e DIST_PORT=${DIST_PORT} -e DDL_AUTO=validate -d ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:pr${{ github.event.number }}-${{ github.run_number }}
