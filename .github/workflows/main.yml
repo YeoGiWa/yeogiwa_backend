@@ -45,10 +45,10 @@ jobs:
           DB_USER=${{ secrets.DB_USER }}
           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
           JWT_SECRET=${{ secrets.JWT_SECRET }}
-          JWT_EXP_TIME=${{ secrets.JWT_EXP_TIME }}
           OPEN_API_KEY=${{ secrets.OPENAPI_KEY }}
           KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
           KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
+          BASE_URL=${{ secrets.BASE_URL }}
           DDL_AUTO=validate
 
       - name: Setup Gradle
@@ -97,4 +97,4 @@ jobs:
             ${{ secrets.PATH_TO_DOCKER }} pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:v${{ github.run_number }}
             ${{ secrets.PATH_TO_DOCKER }} stop ${{ secrets.DOCKER_CONTAINER_NAME }}
             ${{ secrets.PATH_TO_DOCKER }} rm ${{ secrets.DOCKER_CONTAINER_NAME }}
-            ${{ secrets.PATH_TO_DOCKER }} run -p ${{ secrets.DOCKER_PORT_DIST }}:8080 --name ${{ secrets.DOCKER_CONTAINER_NAME }} -e DB_HOST=${{ secrets.DB_HOST }} -e DB_PORT=${{ secrets.DB_PORT_DIST }} -e DB_DB=${{ secrets.DB_DB }} -e DB_USER=${{ secrets.DB_USER }} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e JWT_SECRET=${{ secrets.JWT_SECRET }} -e JWT_EXP_TIME=${{ secrets.JWT_EXP_TIME }} -e OPENAPI_KEY=${{ secrets.OPENAPI_KEY }} -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} -e DDL_AUTO=create -d ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:v${{ github.run_number }}
+            ${{ secrets.PATH_TO_DOCKER }} run -p ${{ secrets.DOCKER_PORT_DIST }}:8080 --name ${{ secrets.DOCKER_CONTAINER_NAME }} -e DB_HOST=${{ secrets.DB_HOST }} -e DB_PORT=${{ secrets.DB_PORT_DIST }} -e DB_DB=${{ secrets.DB_DB }} -e DB_USER=${{ secrets.DB_USER }} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e JWT_SECRET=${{ secrets.JWT_SECRET }} -e OPENAPI_KEY=${{ secrets.OPENAPI_KEY }} -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} -e BASE_URL=${{ secrets.BASE_URL }} -e DDL_AUTO=create -d ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:v${{ github.run_number }}
