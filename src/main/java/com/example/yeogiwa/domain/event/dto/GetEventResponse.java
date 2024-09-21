@@ -1,6 +1,5 @@
 package com.example.yeogiwa.domain.event.dto;
 
-import com.example.yeogiwa.domain.event.SessionEntity;
 import com.example.yeogiwa.openapi.dto.FestivalInfoDto;
 import com.example.yeogiwa.openapi.dto.FestivalImageDto;
 import com.example.yeogiwa.openapi.dto.FestivalDto;
@@ -8,11 +7,7 @@ import com.example.yeogiwa.openapi.dto.FestivalIntroDto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.Session;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Data

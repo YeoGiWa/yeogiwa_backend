@@ -4,8 +4,8 @@ import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
 import com.example.yeogiwa.domain.fund.FundEntity;
 import com.example.yeogiwa.domain.host.HostEntity;
 import com.example.yeogiwa.domain.promoted.PromotedEntity;
+import com.example.yeogiwa.domain.session.SessionEntity;
 import jakarta.persistence.*;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -17,10 +17,8 @@ import org.hibernate.annotations.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import static jakarta.persistence.CascadeType.REMOVE;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity

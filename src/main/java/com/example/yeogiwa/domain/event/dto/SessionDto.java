@@ -1,6 +1,6 @@
 package com.example.yeogiwa.domain.event.dto;
 
-import com.example.yeogiwa.domain.event.SessionEntity;
+import com.example.yeogiwa.domain.session.SessionEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
