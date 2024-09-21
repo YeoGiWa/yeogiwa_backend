@@ -1,5 +1,7 @@
-package com.example.yeogiwa.domain.event;
+package com.example.yeogiwa.domain.favorite;
 
+import com.example.yeogiwa.domain.event.EventEntity;
+import com.example.yeogiwa.domain.event.EventRepository;
 import com.example.yeogiwa.domain.user.UserEntity;
 import com.example.yeogiwa.domain.user.UserRepository;
 import jakarta.transaction.Transactional;

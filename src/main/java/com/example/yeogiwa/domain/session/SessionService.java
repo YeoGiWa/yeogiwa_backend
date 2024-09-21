@@ -1,5 +1,7 @@
-package com.example.yeogiwa.domain.event;
+package com.example.yeogiwa.domain.session;
 
+import com.example.yeogiwa.domain.event.EventEntity;
+import com.example.yeogiwa.domain.event.EventRepository;
 import com.example.yeogiwa.domain.event.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,8 @@
 package com.example.yeogiwa.domain.event;
 
 import com.example.yeogiwa.domain.event.dto.*;
+import com.example.yeogiwa.domain.session.SessionEntity;
+import com.example.yeogiwa.domain.session.SessionService;
 import com.example.yeogiwa.enums.Region;
 import com.example.yeogiwa.domain.event.dto.CreateEventRequest;
 import com.example.yeogiwa.domain.event.dto.GetEventResponse;
@@ -15,7 +17,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 

@@ -1,4 +1,4 @@
-package com.example.yeogiwa.domain.event;
+package com.example.yeogiwa.domain.favorite;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
