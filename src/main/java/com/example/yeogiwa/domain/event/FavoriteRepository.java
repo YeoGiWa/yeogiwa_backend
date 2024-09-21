@@ -16,8 +16,4 @@ public interface FavoriteRepository extends JpaRepository<FavoriteEntity, Long> 
     List<FavoriteEntity> findByUserId(Long userId);
 
     Optional<FavoriteEntity> findByUserIdAndEvent(Long userId, EventEntity event);
-
-    @Modifying
-    @Query("DELETE FROM FavoriteEntity f WHERE f.event = :event AND f.user.id = :userId")
-    void deleteByUserIdAndEvent(@Param("userId") Long userId, @Param("event") EventEntity event);
 }
