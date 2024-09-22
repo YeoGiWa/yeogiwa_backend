@@ -1,8 +1,7 @@
 package com.example.yeogiwa.domain.user;
 
 import com.example.yeogiwa.auth.oauth.PrincipalDetails;
-import com.example.yeogiwa.domain.user.dto.RegisterDTO;
-import com.example.yeogiwa.domain.user.dto.UserDto;
+import com.example.yeogiwa.domain.user.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,11 +11,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,6 +56,59 @@ public class UserController {
 //    public ResponseEntity<Long> register(@RequestBody RegisterDTO registerDTO) {
 //        return ResponseEntity.status(201).body(userService.createUser(registerDTO));
 //    }
+    @PostMapping("/login")
+    @Operation(summary = "로그인 및 회원가입", description = "")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(schema = @Schema(implementation = Long.class))),
+        @ApiResponse(responseCode = "201", description = "로그인 및 회원가입 성공", content = @Content(schema = @Schema(implementation = Long.class))),
+        @ApiResponse(responseCode = "401", description = "잘못된 registration access 토큰", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class)))
+    })
+    public ResponseEntity<Long> login(@RequestBody LoginDto loginDto) {
+
+        /* Check if token is valid */
+        switch (loginDto.getRegistration()) {
+            case "kakao": {
+                RestTemplate request = new RestTemplate();
+                String url = "https://kapi.kakao.com/v1/user/access_token_info";
+                HttpHeaders requestHeader = new HttpHeaders();
+                requestHeader.add(HttpHeaders.AUTHORIZATION, loginDto.getToken());
+                try {
+                    ResponseEntity<KakaoDto> kakaoDto = request.exchange(
+                        url,
+                        HttpMethod.GET,
+                        new HttpEntity<>(requestHeader),
+                        KakaoDto.class
+                    );
+                } catch (HttpClientErrorException e) {
+                    // if token is not valid, return 401
+                    return ResponseEntity.status(401).body(null);
+                }
+                break;
+            }
+            case "apple": {
+                break;
+            }
+            default: return ResponseEntity.status(401).body(null);
+        }
+
+        /* Do login */
+        LoginResponseDto result = userService.login(loginDto);
+
+        /* Set header & cookie */
+        HttpHeaders headers = new HttpHeaders();
+        ResponseCookie responseCookie = ResponseCookie.from(
+            "refresh",
+                Base64.getEncoder().encodeToString(result.getRefreshToken().getBytes())
+            )
+            .httpOnly(true)
+            .secure(true)
+            .maxAge(14 * 24 * 60 * 60 * 1000L) // 2 weeks
+            .build();
+        headers.add(HttpHeaders.AUTHORIZATION, result.getAccessToken());
+        headers.add(HttpHeaders.SET_COOKIE, responseCookie.toString());
+
+        return ResponseEntity.status(result.getStatus()).headers(headers).body(result.getUserId());
+    }
 
     @DeleteMapping("/")
     @Operation(summary = "유저 탈퇴", description = "해당 유저의 isDeleted를 true로 설정(실제로 삭제하지 않음)")
