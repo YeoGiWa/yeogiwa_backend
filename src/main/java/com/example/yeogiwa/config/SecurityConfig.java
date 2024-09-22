@@ -2,9 +2,6 @@ package com.example.yeogiwa.config;
 
 import com.example.yeogiwa.auth.jwt.JwtFilter;
 import com.example.yeogiwa.auth.jwt.JwtUtil;
-import com.example.yeogiwa.auth.oauth.CustomOAuth2AuthenticationFailureHandler;
-import com.example.yeogiwa.auth.oauth.CustomOAuth2AuthenticationSuccessHandler;
-import com.example.yeogiwa.auth.oauth.CustomOAuth2UserService;
 import com.example.yeogiwa.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -14,15 +11,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
-import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -30,7 +20,6 @@ import java.util.Collections;
 public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
-    private final CustomOAuth2UserService customOAuth2UserService;
 
     public static String[] AllowedURLsToPublic = {
         "/error",
@@ -57,17 +46,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
-//            .cors((cors) -> cors
-//                .configurationSource(corsConfigurationSource()))
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
-            .oauth2Login((oAuth2) ->
-                oAuth2
-                    .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
-                        .userService(customOAuth2UserService))
-                    .successHandler(successHandler())
-                    .failureHandler(failureHandler())
-            )
             .addFilterBefore(new JwtFilter(jwtUtil, userRepository),
                 UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
@@ -82,22 +62,4 @@ public class SecurityConfig {
         ;
         return http.build();
     }
-
-//    private CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(Collections.singletonList("/**", "http://*yeogiwa.mathpaul3.synology.me"));
-//        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-////        configuration.setAllowCredentials(true);
-//        configuration.setAllowedHeaders(Collections.singletonList("*"));
-//        configuration.setExposedHeaders(Arrays.asList("Authorization", "Set-Cookie"));
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//        return source;
-//    }
-
-    @Bean
-    public CustomOAuth2AuthenticationSuccessHandler successHandler() { return new CustomOAuth2AuthenticationSuccessHandler(jwtUtil); }
-
-    @Bean
-    public CustomOAuth2AuthenticationFailureHandler failureHandler() { return new CustomOAuth2AuthenticationFailureHandler(); }
 }

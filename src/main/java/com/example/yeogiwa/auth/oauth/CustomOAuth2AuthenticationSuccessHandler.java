@@ -16,7 +16,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CustomOAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtUtil jwtUtil;
-    private static final String redirectURL = "/";
 
 
     @Override
@@ -41,12 +40,5 @@ public class CustomOAuth2AuthenticationSuccessHandler implements AuthenticationS
 
         log.info("requestURL: {}", request.getRequestURL());
         log.info("request: {}", request.getHeader("Referer"));
-//        if (prevPage != null) {
-//            request.getSession().removeAttribute("prevPage");
-//        }
-
-//        String redirectUrl = UriComponentsBuilder.fromUriString(REDIRECT_URL).build().toUriString();
-//        response.sendRedirect(redirectUrl);
-//        response.sendRedirect();
     }
 }

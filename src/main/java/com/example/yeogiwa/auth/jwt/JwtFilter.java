@@ -27,21 +27,11 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken = request.getHeader("Authorization");
         log.info("requestURL: {}", request.getRequestURL());
-//        log.info("requestURI: {}", request.getRequestURI());
-//        log.info("pathInfo: {}", request.getPathInfo());
-//        log.info("contextPath: {}", request.getContextPath());
-//        log.info("remoteHost: {}", request.getRemoteHost());
-//        log.info("headerNames: {}", request.getHeaderNames());
-//        log.info("remoteAddr: {}", request.getRemoteAddr());
-//        log.info("serverPort: {}", request.getServerPort());
-//        log.info("serverPort: {}", request.getSession());
 
         if (accessToken == null) {
             filterChain.doFilter(request, response);
             return;
         }
-
-//        if (request.getRequestURL())
 
         if (!jwtUtil.validateToken(jwtUtil.substringToken(accessToken))) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -64,13 +54,6 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
         log.info("id = {} name = {} role = {}", id.toString(), user.getName(), user.getRole());
-
-//        String newAccessToken = jwtUtil.createToken(
-//            "access",
-//            user.getId(),
-//            user.getRole().name(),
-//            1 * 60 * 60 * 1000L
-//        );
 
         PrincipalDetails principal = new PrincipalDetails(user, null);
         Authentication authentication = new UsernamePasswordAuthenticationToken(principal, accessToken, principal.getAuthorities());
