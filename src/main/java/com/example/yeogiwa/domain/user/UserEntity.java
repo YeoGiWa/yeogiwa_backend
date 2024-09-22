@@ -41,8 +41,7 @@ public class UserEntity {
     private String oauth2Id;
 
     /* Columns */
-    @NonNull
-    @Column(nullable = false)
+    @Column
     private String email;
 
     @NonNull

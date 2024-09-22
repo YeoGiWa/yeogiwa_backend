@@ -40,7 +40,8 @@ public class SecurityConfig {
         "/v3/api-docs/**",
         "/oauth2/authorization/kakao",
         "/login/oauth2/code/kakao",
-        "/redis/**"
+        "/redis/**",
+        "/user/login"
     };
 
     public static String[] AllowedGetMethodURLsToPublic = {
