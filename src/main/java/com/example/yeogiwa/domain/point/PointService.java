@@ -1,10 +1,39 @@
 package com.example.yeogiwa.domain.point;
 
-import lombok.RequiredArgsConstructor;
+import com.example.yeogiwa.domain.point.dto.PointDto;
+import com.example.yeogiwa.domain.user.UserEntity;
+import com.example.yeogiwa.domain.user.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class PointService {
+
     private final PointRepository pointRepository;
+    private final UserRepository userRepository;
+
+    public PointService(PointRepository pointRepository, UserRepository userRepository) {
+        this.pointRepository = pointRepository;
+        this.userRepository = userRepository;
+    }
+
+    public Page<PointDto> getPointHistory(Long userId, Pageable pageable) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        return pointRepository.findByUserOrderByCreatedAtDesc(user, pageable)
+                .map(PointDto::from);
+    }
+
+    public Integer getTotalPoints(Long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return pointRepository.findTotalPointsByUser(user);
+    }
 }
+
+
+

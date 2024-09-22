@@ -1,5 +1,6 @@
 package com.example.yeogiwa.domain.point;
 
+import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
 import com.example.yeogiwa.domain.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -10,7 +11,6 @@ import lombok.Setter;
 import org.springframework.lang.NonNull;
 
 import java.util.Date;
-import java.util.UUID;
 
 @Entity
 @Builder
@@ -21,16 +21,19 @@ import java.util.UUID;
 public class PointEntity {
     /* Keys */
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "point_id")
-    private UUID id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ambassador_id", nullable = false)
+    private AmbassadorEntity ambassador;
+
     /* Columns */
-    @NonNull
     @Column(nullable = false)
     private String title;
 
@@ -42,5 +45,4 @@ public class PointEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    /* Related */
 }
