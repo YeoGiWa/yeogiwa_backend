@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,15 +23,11 @@ import org.springframework.web.client.HttpClientErrorException;
 @RestController
 @Tag(name = "🪙 포인트 API", description = "포인트 관련 API")
 @RequestMapping("/point")
+@RequiredArgsConstructor
 public class PointController {
 
     private final PointService pointService;
     private final JwtUtil jwtUtil;
-
-    public PointController(PointService pointService, JwtUtil jwtUtil) {
-        this.pointService = pointService;
-        this.jwtUtil = jwtUtil;
-    }
 
     @Operation(summary = "유저의 포인트 내역 조회", description = "유저의 적립 및 사용 내역을 10개씩 반환합니다.(무한 스크롤), amount가 양수면 적립, 음수면 사용을 의미합니다.")
     @ApiResponses(value = {
