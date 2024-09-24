@@ -37,9 +37,6 @@ public class HostEntity {
     private UserEntity user;
 
     /* Columns */
-    @Column
-    private String name;
-
     @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 

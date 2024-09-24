@@ -30,7 +30,6 @@ public class HostDto {
         return HostDto.builder()
             .id(hostEntity.getId())
             .user(user)
-            .name(hostEntity.getName())
             .createdAt(hostEntity.getCreatedAt())
             .isDeleted(hostEntity.getIsDeleted())
             .build();

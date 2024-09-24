@@ -35,7 +35,6 @@ public interface OpenApiClient {
         @RequestParam("_type") String responseType,
         @RequestParam("listYN") String listYN,
         @RequestParam("arrange") String arrange,
-        @RequestParam("areaCode") String areaCode,
         @RequestParam("keyword") String keyword,
         @RequestParam("contentTypeId") String contentTypeId,
         @RequestParam("serviceKey") String serviceKey

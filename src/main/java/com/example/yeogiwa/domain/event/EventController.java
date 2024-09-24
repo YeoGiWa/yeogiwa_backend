@@ -6,6 +6,7 @@ import com.example.yeogiwa.domain.session.SessionService;
 import com.example.yeogiwa.enums.Region;
 import com.example.yeogiwa.domain.event.dto.CreateEventRequest;
 import com.example.yeogiwa.domain.event.dto.GetEventResponse;
+import com.example.yeogiwa.openapi.dto.FestivalDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -234,5 +235,26 @@ public class EventController {
         List<EventDto> events = eventService.listEventsByHost(email);
 
         return ResponseEntity.status(200).body(events);
+    }
+
+    @Operation(summary = "키워드로 축제 정보 검색", description = "검색한 축제들의 기본 정보를 반환")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "축제의 정보를 정상적으로 반환", content = {
+                    @Content(array = @ArraySchema(schema = @Schema(implementation = FestivalDto.class)))
+            }),
+            @ApiResponse(responseCode = "400", description = "오류로 인해 축제의 정보를 반환하지 못함", content = {
+                    @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))
+            }),
+    })
+    @GetMapping("/list/keyword")
+    public ResponseEntity<List<FestivalDto>> listFestivalsByKeyword(
+        @Parameter(description = "페이지에 보여줄 결과의 갯수 입니다. 기본 값은 10입니다.", example = "10") @RequestParam(name = "numOfRows", defaultValue = "10") int numOfRows,
+        @Parameter(description = "페이지 번호입니다. 1부터 시작합니다.", example = "1") @RequestParam("pageNo") int pageNo,
+        @Parameter(description = "검색할 축제의 키워드입니다.", example = "축제") @RequestParam(name = "keyword") String keyword
+
+    ) {
+        List<FestivalDto> event = eventService.listEventsByKeyword(numOfRows, pageNo, keyword);
+
+        return ResponseEntity.status(200).body(event);
     }
 }

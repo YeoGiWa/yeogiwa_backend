@@ -7,6 +7,7 @@ import com.example.yeogiwa.domain.host.HostEntity;
 import com.example.yeogiwa.domain.host.HostRepository;
 import com.example.yeogiwa.domain.user.UserEntity;
 import com.example.yeogiwa.domain.user.UserRepository;
+import com.example.yeogiwa.enums.EventSort;
 import com.example.yeogiwa.enums.Region;
 import com.example.yeogiwa.openapi.dto.FestivalInfoDto;
 import com.example.yeogiwa.openapi.dto.FestivalImageDto;
@@ -163,6 +164,13 @@ public class EventService {
                 })
                 .toList();
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<FestivalDto> listEventsByKeyword(int numOfRows, int pageNo, String keyword) {
+        List<FestivalDto> festivals = openApiService.listFestivalDetailsByKeyword(numOfRows, pageNo, EventSort.TITLE, keyword);
+
+        return festivals;
     }
 
     @Transactional(readOnly = true)

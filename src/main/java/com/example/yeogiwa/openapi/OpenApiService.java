@@ -40,11 +40,11 @@ public class OpenApiService {
         return null;
     }
 
-    public List<FestivalDto> listFestivalDetailsByKeyword(int numOfRows, int pageNo, EventSort eventSort, Region region, String keyword) {
+    public List<FestivalDto> listFestivalDetailsByKeyword(int numOfRows, int pageNo, EventSort eventSort, String keyword) {
         FestivalResponse<FestivalDto> response = null;
         try {
             response = openApiClient.listFestivalByKeyword(numOfRows, pageNo, "ETC", "test", "json",
-                "Y", eventSort.type, region.code, keyword, "15", serviceKey);
+                "Y", eventSort.type, keyword, "15", serviceKey);
         } catch(DecodeException e) {
             return null;
         }
