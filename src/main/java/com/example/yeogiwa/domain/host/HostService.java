@@ -21,12 +21,11 @@ public class HostService {
     public HostDto createHost(String email, CreateHostRequest request) {
         UserEntity user = userRepository.findByEmail(email);
 
-        EventEntity event = eventRepository.findById(request.getEventId())
-            .orElseThrow(() -> new RuntimeException("Event not found"));
-
         HostEntity host = HostEntity.builder()
             .user(user)
             .build();
+
+        // TODO: 실제로는 request 내용 저장하고 있어야 함
 
         hostRepository.save(host);
 

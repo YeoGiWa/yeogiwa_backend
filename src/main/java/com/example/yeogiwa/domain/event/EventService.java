@@ -5,6 +5,7 @@ import com.example.yeogiwa.domain.ambassador.AmbassadorRepository;
 import com.example.yeogiwa.domain.event.dto.*;
 import com.example.yeogiwa.domain.host.HostEntity;
 import com.example.yeogiwa.domain.host.HostRepository;
+import com.example.yeogiwa.domain.host.HostService;
 import com.example.yeogiwa.domain.user.UserEntity;
 import com.example.yeogiwa.domain.user.UserRepository;
 import com.example.yeogiwa.enums.EventSort;
@@ -34,8 +35,8 @@ import java.util.stream.Collectors;
 public class EventService {
     private final OpenApiService openApiService;
     private final UserRepository userRepository;
-    private final AmbassadorRepository ambassadorRepository;
     private final HostRepository hostRepository;
+    private final AmbassadorRepository ambassadorRepository;
     private final EventRepository eventRepository;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -203,13 +204,17 @@ public class EventService {
     }
 
     @Transactional
-    public EventDto createEvent(CreateEventRequest request) {
+    public EventDto createEvent(String email, CreateEventRequest request) {
+        HostEntity host = hostRepository.findByUser(userRepository.findByEmail(email))
+            .orElseThrow(() -> new IllegalArgumentException("호스트로 등록되지 않은 유저입니다."));
+
         FestivalDto festivalDto = openApiService.getFestivalDetail(request.getId());
 
         FestivalIntroDto festivalIntroDto = openApiService.getFestivalDetailIntro(request.getId());
 
         EventEntity event = EventEntity.builder()
             .id(festivalDto.getContentid())
+            .host(host)
             .name(request.getName())
             .place(festivalDto.getAddr1())
             .ratio(request.getRatio())

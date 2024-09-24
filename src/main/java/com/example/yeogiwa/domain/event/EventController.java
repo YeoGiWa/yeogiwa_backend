@@ -106,6 +106,7 @@ public class EventController {
     }
 
     // 호스트 혹은 관리자 전용
+    // 호스트가 자신의 이벤트로 신청 시 운영자가 확인 후 등록 -> 심사를 위해 호스트가 자신의 이벤트로 신청 시 바로 등록
     @Operation(summary = "이벤트 생성", description = "축제 API의 id로 새로운 이벤트를 생성")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "이벤트를 정상적으로 생성", content = {
@@ -118,7 +119,8 @@ public class EventController {
     @PostMapping
     public ResponseEntity<EventDto> createEvent(@Valid @RequestBody CreateEventRequest request) {
         // TODO: 관리자만 생성 가능하도록 수정
-        EventDto createdEventDto = eventService.createEvent(request);
+        String email = "test@gmail.com";
+        EventDto createdEventDto = eventService.createEvent(email, request);
 
         return ResponseEntity.status(200).body(createdEventDto);
     }

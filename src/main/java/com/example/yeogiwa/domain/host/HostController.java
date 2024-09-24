@@ -21,6 +21,7 @@ import org.springframework.web.client.HttpClientErrorException;
 public class HostController {
     private final HostService hostService;
 
+    // 유저가 관리자 신청하면 운영자가 확인 후 호스트로 등록 -> 심사를 위해 관리자 신청시 바로 호스트로 등록
     @PostMapping
     @Operation(summary = "호스트 등록", description = "행사/축제의 호스트로 등록")
     @ApiResponses(value = {
@@ -29,7 +30,7 @@ public class HostController {
         @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
         @ApiResponse(responseCode = "404", description = "존재하지 않는 행사/축제인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
     })
-    public ResponseEntity<HostDto> registerAmbassador(@RequestBody CreateHostRequest request) {
+    public ResponseEntity<HostDto> registerHost(@RequestBody CreateHostRequest request) {
         // TODO: 토큰에서 가져오기
         String email = "test@gmail.com";
 
