@@ -2,6 +2,7 @@ package com.example.yeogiwa.domain.point;
 
 import com.example.yeogiwa.domain.point.dto.PointDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,7 +31,7 @@ public class PointController {
     @Operation(summary = "유저의 포인트 내역 조회", description = "유저의 적립 및 사용 내역을 10개씩 반환합니다.(무한 스크롤), amount가 양수면 적립, 음수면 사용을 의미합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "포인트 내역을 정상적으로 반환", content = {
-                    @Content(schema = @Schema(implementation = PointDto.class))
+                    @Content(array = @ArraySchema(schema = @Schema (implementation = PointDto.class)))
             }),
             @ApiResponse(responseCode = "204", description = "포인트 내역이 존재하지 않음", content = @Content),
             @ApiResponse(responseCode = "404", description = "해당 유저를 찾을 수 없음", content = {
@@ -48,7 +49,7 @@ public class PointController {
         if (pointHistory.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(pointHistory, HttpStatus.OK);
+        return ResponseEntity.status(200).body(pointHistory);
     }
 
     @Operation(summary = "유저의 총 포인트 조회", description = "유저의 총 포인트 합계를 반환 합니다.")
@@ -56,7 +57,6 @@ public class PointController {
             @ApiResponse(responseCode = "200", description = "총 포인트를 정상적으로 반환", content = {
                     @Content(schema = @Schema(implementation = Integer.class))
             }),
-            @ApiResponse(responseCode = "204", description = "포인트가 존재하지 않음", content = @Content),
             @ApiResponse(responseCode = "404", description = "해당 유저를 찾을 수 없음", content = {
                     @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class))
             })
@@ -67,5 +67,3 @@ public class PointController {
         return new ResponseEntity<>(totalPoints == null ? 0 : totalPoints, HttpStatus.OK);
     }
 }
-
-
