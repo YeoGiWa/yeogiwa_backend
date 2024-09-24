@@ -61,7 +61,7 @@ public class UserController {
                 RestTemplate request = new RestTemplate();
                 String url = "https://kapi.kakao.com/v1/user/access_token_info";
                 HttpHeaders requestHeader = new HttpHeaders();
-                requestHeader.add(HttpHeaders.AUTHORIZATION, loginDto.getToken());
+                requestHeader.add(HttpHeaders.AUTHORIZATION, "Bearer " + Base64.getDecoder().decode(loginDto.getToken()));
                 try {
                     ResponseEntity<KakaoDto> kakaoDto = request.exchange(
                         url,
