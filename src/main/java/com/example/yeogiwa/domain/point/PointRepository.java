@@ -8,9 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface PointRepository extends JpaRepository<PointEntity, Long> {
 
-    Page<PointEntity> findByUserOrderByCreatedAtDesc(UserEntity user, Pageable pageable);
+    Page<PointEntity> findByUser_IdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
     @Query("SELECT SUM(p.amount) FROM PointEntity p WHERE p.user = :user")
-    Integer findTotalPointsByUser(UserEntity user);
+    Long findTotalPointsByUser_Id(Long userId);
 }
 
