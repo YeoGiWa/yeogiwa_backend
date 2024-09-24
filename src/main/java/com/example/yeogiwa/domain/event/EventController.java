@@ -1,5 +1,6 @@
 package com.example.yeogiwa.domain.event;
 
+import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
 import com.example.yeogiwa.domain.event.dto.*;
 import com.example.yeogiwa.domain.session.SessionEntity;
 import com.example.yeogiwa.domain.session.SessionService;
@@ -207,7 +208,7 @@ public class EventController {
     @GetMapping("/ambassadors")
     @Operation(summary = "앰배서더 홍보 목록 조회", description = "해당 유저가 홍보하고 있는 행사/축제 목록 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "유저가 홍보중인 행사/축제 목록을 성공적으로 조회한 경우", content = @Content(schema = @Schema(implementation = EventDto.class))),
+            @ApiResponse(responseCode = "200", description = "유저가 홍보중인 행사/축제 목록을 성공적으로 조회한 경우", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EventDto.class)))),
             @ApiResponse(responseCode = "400", description = "오류가 발생해 유저가 홍보중인 행사/축제 목록을 조회하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
             @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 유저이거나 탈퇴한 유저인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
@@ -224,7 +225,7 @@ public class EventController {
     @GetMapping("/hosts")
     @Operation(summary = "호스트의 행사 목록 조회", description = "호스트가 등록한 행사/축제 목록 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "호스트가 등록한 행사/축제 목록을 성공적으로 조회한 경우", content = @Content(schema = @Schema(implementation = EventDto.class))),
+            @ApiResponse(responseCode = "200", description = "호스트가 등록한 행사/축제 목록을 성공적으로 조회한 경우", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EventDto.class)))),
             @ApiResponse(responseCode = "400", description = "오류가 발생해 호스트가 등록한 행사/축제 목록을 조회하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
             @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 호스트인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
