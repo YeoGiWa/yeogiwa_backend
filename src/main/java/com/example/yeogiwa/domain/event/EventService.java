@@ -102,20 +102,24 @@ public class EventService {
                     if(region != Region.ALL)
                         eventMap = eventRepository.findAllByStartAtBetweenAndRegionOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.of(2099, 12, 31), region.code)
                             .stream()
+                            .filter(event -> event.getTotalFund() > 0)
                             .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
                     else
                         eventMap = eventRepository.findAllByStartAtBetweenOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.parse(eventEndDate, formatter))
                             .stream()
+                            .filter(event -> event.getTotalFund() > 0)
                             .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
                 }
             else {
                 if(region != Region.ALL)
                     eventMap = eventRepository.findAllByStartAtBetweenAndRegionOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.parse(eventEndDate, formatter), region.code)
                         .stream()
+                        .filter(event -> event.getTotalFund() > 0)
                         .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
                 else
                     eventMap = eventRepository.findAllByStartAtBetweenOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.parse(eventEndDate, formatter))
                         .stream()
+                        .filter(event -> event.getTotalFund() > 0)
                         .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
             }
 
@@ -127,10 +131,6 @@ public class EventService {
                         .firstimage(eventEntity.getImageUrl())
                         .addr1(eventEntity.getPlace())
                         .build();
-
-                    List<SessionDto> sessionDtos = eventEntity.getSessions().stream()
-                        .map(SessionDto::from)  // SessionDto.of(entity) 사용하여 변환
-                        .toList();
 
                     return new GetEventResponse(festivalDto, null, null, null, EventDto.from(eventEntity), true);
                 })
@@ -167,7 +167,7 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public List<FestivalDto> listEventsByKeyword(int numOfRows, int pageNo, String keyword) {
+    public List<FestivalDto> listFestivalsByKeyword(int numOfRows, int pageNo, String keyword) {
         List<FestivalDto> festivals = openApiService.listFestivalDetailsByKeyword(numOfRows, pageNo, EventSort.TITLE, keyword);
 
         return festivals;
@@ -190,13 +190,11 @@ public class EventService {
             .map(festival -> {
                 Optional<EventEntity> event = Optional.ofNullable(eventMap.get(festival.getContentid()));
 
-                Boolean isValid1 = event.map(eventEntity -> eventEntity.getStartAt().isBefore(LocalDate.now()) && eventEntity.getEndAt().isAfter(LocalDate.now())).orElse(false);
+                Boolean isValid1 = event.map(
+                        eventEntity -> (eventEntity.getStartAt().isBefore(LocalDate.now()) && eventEntity.getEndAt().isAfter(LocalDate.now())) || eventEntity.getTotalFund() > 0)
+                        .orElse(false);
 
                 return event.map(eventEntity -> {
-                    List<SessionDto> sessionDtos = eventEntity.getSessions().stream()
-                        .map(SessionDto::from)
-                        .toList();
-
                     return new GetEventResponse(festival, null, null, null, EventDto.from(eventEntity), isValid1);
                 }).orElseGet(() ->
                         new GetEventResponse(festival, null, null, null, null, false));
@@ -216,6 +214,7 @@ public class EventService {
             .place(festivalDto.getAddr1())
             .ratio(request.getRatio())
             .region(festivalDto.getAreacode().toString())
+            .totalFund(0)
             .startAt(LocalDate.parse(festivalIntroDto.getEventstartdate(), formatter))
             .endAt(LocalDate.parse(festivalIntroDto.getEventenddate(), formatter))
             .imageUrl(festivalDto.getFirstimage())
@@ -235,6 +234,9 @@ public class EventService {
         event.setPlace(request.getPlace());
         event.setRatio(request.getRatio());
         event.setCreatedAt(LocalDateTime.now());
+
+        if (request.getFund() != null)
+            event.setTotalFund(event.getTotalFund() + request.getFund());
 
         EventEntity updatedEvent = eventRepository.save(event);
 
@@ -260,11 +262,12 @@ public class EventService {
             events = eventRepository.findAllByIdIn(eventIds)
                     .stream()
                     .filter(event -> event.getEndAt().isAfter(LocalDate.now()))
+                    .filter(event -> event.getTotalFund() > 0)
                     .toList();
         else
             events = eventRepository.findAllByIdIn(eventIds)
                     .stream()
-                    .filter(event -> event.getEndAt().isBefore(LocalDate.now()))
+                    .filter(event -> event.getEndAt().isBefore(LocalDate.now()) || event.getTotalFund() <= 0)
                     .toList();
 
         return events.stream()

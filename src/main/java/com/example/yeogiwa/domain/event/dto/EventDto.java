@@ -32,6 +32,8 @@ public class EventDto {
 
     private String region;
 
+    private Integer totalFund;
+
     private LocalDateTime createdAt;
 
     private List<SessionDto> sessions;
@@ -57,6 +59,7 @@ public class EventDto {
             .endAt(event.getEndAt())
             .imageUrl(event.getImageUrl())
             .region(event.getRegion())
+            .totalFund(event.getTotalFund())
             .createdAt(event.getCreatedAt())
             .sessions(sessions)
             .build();

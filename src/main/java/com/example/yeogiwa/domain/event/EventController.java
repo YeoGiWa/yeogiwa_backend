@@ -253,7 +253,7 @@ public class EventController {
         @Parameter(description = "검색할 축제의 키워드입니다.", example = "축제") @RequestParam(name = "keyword") String keyword
 
     ) {
-        List<FestivalDto> event = eventService.listEventsByKeyword(numOfRows, pageNo, keyword);
+        List<FestivalDto> event = eventService.listFestivalsByKeyword(numOfRows, pageNo, keyword);
 
         return ResponseEntity.status(200).body(event);
     }

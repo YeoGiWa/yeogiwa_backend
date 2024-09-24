@@ -25,6 +25,9 @@ public class UpdateEventRequest {
     @Schema(description = "행사에서 포인트를 앰버서더에게 나누어줄 비율. 0~100 사이의 값으로 보내주세요.", example = "50")
     private int ratio;
 
+    @Schema(description = "이벤트에 추가할 포인트", example = "1000")
+    private Integer fund;
+
 //    private List<AmbassadorEntity> ambassadors = new ArrayList<>();
 //
 //    private List<PromotedEntity> promotes = new ArrayList<>();

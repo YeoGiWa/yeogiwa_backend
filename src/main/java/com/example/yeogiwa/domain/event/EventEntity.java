@@ -1,7 +1,6 @@
 package com.example.yeogiwa.domain.event;
 
 import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
-import com.example.yeogiwa.domain.fund.FundEntity;
 import com.example.yeogiwa.domain.host.HostEntity;
 import com.example.yeogiwa.domain.promoted.PromotedEntity;
 import com.example.yeogiwa.domain.session.SessionEntity;
@@ -65,6 +64,8 @@ public class EventEntity {
 
     private String region;
 
+    private Integer totalFund;
+
     /* Related */
     @OneToMany(mappedBy = "event")
     @Builder.Default
@@ -73,10 +74,6 @@ public class EventEntity {
     @OneToMany(mappedBy = "event")
     @Builder.Default
     private List<PromotedEntity> promotes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "event")
-    @Builder.Default
-    private List<FundEntity> funds = new ArrayList<>();
 
     @OneToMany(mappedBy = "event")
     @Builder.Default
