@@ -208,6 +208,11 @@ public class EventService {
         HostEntity host = hostRepository.findByUser(userRepository.findByEmail(email))
             .orElseThrow(() -> new IllegalArgumentException("호스트로 등록되지 않은 유저입니다."));
 
+        eventRepository.findById(request.getId())
+            .ifPresent(event -> {
+                throw new IllegalArgumentException("이미 등록된 이벤트입니다.");
+            });
+
         FestivalDto festivalDto = openApiService.getFestivalDetail(request.getId());
 
         FestivalIntroDto festivalIntroDto = openApiService.getFestivalDetailIntro(request.getId());
@@ -286,8 +291,7 @@ public class EventService {
         HostEntity host = hostRepository.findByUser(user)
             .orElseThrow(() -> new IllegalArgumentException("호스트로 등록되지 않은 유저입니다."));
 
-        PageRequest pageable = PageRequest.of(0, 10, Sort.by("createAt").descending());
-        Page<EventEntity> events = eventRepository.findAllByHost(pageable, host);
+        List<EventEntity> events = eventRepository.findAllByHost(host);
 
         return events.stream()
                 .map(EventDto::from)

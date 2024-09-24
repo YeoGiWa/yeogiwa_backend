@@ -17,5 +17,5 @@ public interface EventRepository extends JpaRepository<EventEntity, String> {
 
     Page<EventEntity> findAllByStartAtBetweenAndRegionOrderByStartAtDesc(Pageable pageable, LocalDate startAt, LocalDate endAt, String region);
 
-    Page<EventEntity> findAllByHost(Pageable pageable, HostEntity host);
+    List<EventEntity> findAllByHost(HostEntity host);
 }

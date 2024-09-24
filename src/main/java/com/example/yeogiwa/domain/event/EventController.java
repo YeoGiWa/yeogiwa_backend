@@ -1,9 +1,13 @@
 package com.example.yeogiwa.domain.event;
 
+import com.example.yeogiwa.auth.oauth.PrincipalDetails;
 import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
 import com.example.yeogiwa.domain.event.dto.*;
 import com.example.yeogiwa.domain.session.SessionEntity;
 import com.example.yeogiwa.domain.session.SessionService;
+import com.example.yeogiwa.domain.user.UserEntity;
+import com.example.yeogiwa.domain.user.UserService;
+import com.example.yeogiwa.domain.user.dto.UserDto;
 import com.example.yeogiwa.enums.Region;
 import com.example.yeogiwa.domain.event.dto.CreateEventRequest;
 import com.example.yeogiwa.domain.event.dto.GetEventResponse;
@@ -19,10 +23,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -33,6 +39,7 @@ public class EventController {
 
     private final EventService eventService;
     private final SessionService sessionService;
+    private final UserService userService;
 
     @Operation(summary = "특정 이벤트 정보 조회", description = "특정 이벤트의 상세 정보를 반환")
     @ApiResponses(value = {
@@ -108,7 +115,7 @@ public class EventController {
 
     // 호스트 혹은 관리자 전용
     // 호스트가 자신의 이벤트로 신청 시 운영자가 확인 후 등록 -> 심사를 위해 호스트가 자신의 이벤트로 신청 시 바로 등록
-    @Operation(summary = "이벤트 생성", description = "축제 API의 id로 새로운 이벤트를 생성")
+    @Operation(summary = "이벤트 신청 및 생성", description = "축제 API의 id로 새로운 이벤트를 생성")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "이벤트를 정상적으로 생성", content = {
             @Content(schema = @Schema(implementation = EventDto.class))
@@ -118,9 +125,11 @@ public class EventController {
         })
     })
     @PostMapping
-    public ResponseEntity<EventDto> createEvent(@Valid @RequestBody CreateEventRequest request) {
-        // TODO: 관리자만 생성 가능하도록 수정
-        String email = "test@gmail.com";
+    public ResponseEntity<EventDto> createEvent(Authentication authentication, @Valid @RequestBody CreateEventRequest request) {
+        PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
+        Optional<UserEntity> opUser = userService.getUser(user.getUserId());
+        UserDto userDto = UserDto.from(opUser);
+        String email = userDto.getEmail();
         EventDto createdEventDto = eventService.createEvent(email, request);
 
         return ResponseEntity.status(200).body(createdEventDto);
@@ -213,9 +222,12 @@ public class EventController {
             @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 유저이거나 탈퇴한 유저인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
     })
-    public ResponseEntity<List<EventDto>> getUserAmbassadorList(@Parameter(description = "진행중 여부입니다.", example = "true") @RequestParam(name = "isValid") Boolean isValid) {
+    public ResponseEntity<List<EventDto>> getUserAmbassadorList(Authentication authentication, @Parameter(description = "진행중 여부입니다.", example = "true") @RequestParam(name = "isValid") Boolean isValid) {
         // TODO: 토큰에서 가져오기
-        String email = "test@gmail.com";
+        PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
+        Optional<UserEntity> opUser = userService.getUser(user.getUserId());
+        UserDto userDto = UserDto.from(opUser);
+        String email = userDto.getEmail();
 
         List<EventDto> events = eventService.listEventsByAmbassador(email, isValid);
 
@@ -230,10 +242,11 @@ public class EventController {
             @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 호스트인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
     })
-    public ResponseEntity<List<EventDto>> getHostEventList() {
-        // TODO: 권한 검증하기
-        // TODO: 토큰에서 가져오기
-        String email = "test@gmail.com";
+    public ResponseEntity<List<EventDto>> getHostEventList(Authentication authentication) {
+        PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
+        Optional<UserEntity> opUser = userService.getUser(user.getUserId());
+        UserDto userDto = UserDto.from(opUser);
+        String email = userDto.getEmail();
 
         List<EventDto> events = eventService.listEventsByHost(email);
 
