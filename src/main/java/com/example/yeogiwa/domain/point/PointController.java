@@ -1,5 +1,6 @@
 package com.example.yeogiwa.domain.point;
 
+import com.example.yeogiwa.auth.jwt.JwtUtil;
 import com.example.yeogiwa.domain.point.dto.PointDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,9 +25,11 @@ import org.springframework.web.client.HttpClientErrorException;
 public class PointController {
 
     private final PointService pointService;
+    private final JwtUtil jwtUtil;
 
-    public PointController(PointService pointService) {
+    public PointController(PointService pointService, JwtUtil jwtUtil) {
         this.pointService = pointService;
+        this.jwtUtil = jwtUtil;
     }
 
     @Operation(summary = "유저의 포인트 내역 조회", description = "유저의 적립 및 사용 내역을 10개씩 반환합니다.(무한 스크롤), amount가 양수면 적립, 음수면 사용을 의미합니다.")
@@ -38,14 +42,16 @@ public class PointController {
                     @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class))
             })
     })
-    @GetMapping("/{userId}/history")
+    @GetMapping("/history")
     public ResponseEntity<Page<PointDto>> getPointHistory(
-            @PathVariable Long userId,
-            @RequestParam(defaultValue = "0") int pageNo) {
+            @RequestParam(defaultValue = "0") int pageNo, HttpServletRequest request) {
+
+        String token = jwtUtil.substringToken(request.getHeader("Authorization"));
 
         Pageable pageable = PageRequest.of(pageNo, 10, Sort.by("createdAt").descending());
 
-        Page<PointDto> pointHistory = pointService.getPointHistory(userId, pageable);
+        Page<PointDto> pointHistory = pointService.getPointHistory(token, pageable);
+
         if (pointHistory.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -61,9 +67,13 @@ public class PointController {
                     @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class))
             })
     })
-    @GetMapping("/{userId}/total")
-    public ResponseEntity<Integer> getTotalPoints(@PathVariable Long userId) {
-        Integer totalPoints = pointService.getTotalPoints(userId);
+    @GetMapping("/total")
+    public ResponseEntity<Integer> getTotalPoints(HttpServletRequest request) {
+
+        String token = jwtUtil.substringToken(request.getHeader("Authorization"));
+
+        Integer totalPoints = pointService.getTotalPoints(token);
+
         return new ResponseEntity<>(totalPoints == null ? 0 : totalPoints, HttpStatus.OK);
     }
 }
