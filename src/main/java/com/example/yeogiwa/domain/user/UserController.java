@@ -46,16 +46,6 @@ public class UserController {
         return ResponseEntity.status(200).body(userDto);
     }
 
-//    @PostMapping("/register")
-//    @Operation(summary = "회원가입", description = "새로운 유저 생성")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "201", description = "새로운 유저를 성공적으로 생성한 경우"),
-//            @ApiResponse(responseCode = "400", description = "에러가 발생해 유저를 생성하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
-//            @ApiResponse(responseCode = "409", description = "해당 이메일로 이미 가입된 유저가 존재하는 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Conflict.class)))
-//    })
-//    public ResponseEntity<Long> register(@RequestBody RegisterDTO registerDTO) {
-//        return ResponseEntity.status(201).body(userService.createUser(registerDTO));
-//    }
     @PostMapping("/login")
     @Operation(summary = "로그인 및 회원가입", description = "")
     @ApiResponses(value = {
@@ -71,7 +61,7 @@ public class UserController {
                 RestTemplate request = new RestTemplate();
                 String url = "https://kapi.kakao.com/v1/user/access_token_info";
                 HttpHeaders requestHeader = new HttpHeaders();
-                requestHeader.add(HttpHeaders.AUTHORIZATION, loginDto.getToken());
+                requestHeader.add(HttpHeaders.AUTHORIZATION, "Bearer " + new String(Base64.getDecoder().decode(loginDto.getToken())));
                 try {
                     ResponseEntity<KakaoDto> kakaoDto = request.exchange(
                         url,
