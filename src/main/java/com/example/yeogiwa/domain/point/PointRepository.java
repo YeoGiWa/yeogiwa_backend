@@ -10,7 +10,7 @@ public interface PointRepository extends JpaRepository<PointEntity, Long> {
 
     Page<PointEntity> findByUser_IdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
-    @Query("SELECT SUM(p.amount) FROM PointEntity p WHERE p.user = :user")
+    @Query("SELECT SUM(p.amount) FROM PointEntity p WHERE p.user.id = :userId")
     Long findTotalPointsByUser_Id(Long userId);
 }
 
