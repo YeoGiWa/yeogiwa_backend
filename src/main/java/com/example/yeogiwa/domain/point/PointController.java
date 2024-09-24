@@ -42,20 +42,20 @@ public class PointController {
                     @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class))
             })
     })
-    @GetMapping("/history")
-    public ResponseEntity<Page<PointDto>> getPointHistory(
+    @GetMapping("/list")
+    public ResponseEntity<Page<PointDto>> getPointList(
             @RequestParam(defaultValue = "0") int pageNo, HttpServletRequest request) {
 
         String token = jwtUtil.substringToken(request.getHeader("Authorization"));
 
         Pageable pageable = PageRequest.of(pageNo, 10, Sort.by("createdAt").descending());
 
-        Page<PointDto> pointHistory = pointService.getPointHistory(token, pageable);
+        Page<PointDto> pointList = pointService.getPointList(token, pageable);
 
-        if (pointHistory.isEmpty()) {
+        if (pointList.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        return ResponseEntity.status(200).body(pointHistory);
+        return ResponseEntity.status(200).body(pointList);
     }
 
     @Operation(summary = "유저의 총 포인트 조회", description = "유저의 총 포인트 합계를 반환 합니다.")

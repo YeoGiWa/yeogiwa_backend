@@ -34,10 +34,10 @@ public class PointEntity {
     private AmbassadorEntity ambassador;
 
     /* Columns */
+    @NonNull
     @Column(nullable = false)
     private String title;
 
-    @NonNull
     @Column(nullable = false)
     private int amount;
 

@@ -20,7 +20,7 @@ public class PointService {
         this.userRepository = userRepository;
     }
 
-    public Page<PointDto> getPointHistory(String token, Pageable pageable) {
+    public Page<PointDto> getPointList(String token, Pageable pageable) {
         Long userId = jwtUtil.getId(token);
 
         UserEntity user = userRepository.findById(userId)
