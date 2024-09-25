@@ -5,8 +5,10 @@ import com.example.yeogiwa.domain.ambassador.AmbassadorRepository;
 import com.example.yeogiwa.domain.event.dto.*;
 import com.example.yeogiwa.domain.host.HostEntity;
 import com.example.yeogiwa.domain.host.HostRepository;
+import com.example.yeogiwa.domain.host.HostService;
 import com.example.yeogiwa.domain.user.UserEntity;
 import com.example.yeogiwa.domain.user.UserRepository;
+import com.example.yeogiwa.enums.EventSort;
 import com.example.yeogiwa.enums.Region;
 import com.example.yeogiwa.openapi.dto.FestivalInfoDto;
 import com.example.yeogiwa.openapi.dto.FestivalImageDto;
@@ -33,8 +35,8 @@ import java.util.stream.Collectors;
 public class EventService {
     private final OpenApiService openApiService;
     private final UserRepository userRepository;
-    private final AmbassadorRepository ambassadorRepository;
     private final HostRepository hostRepository;
+    private final AmbassadorRepository ambassadorRepository;
     private final EventRepository eventRepository;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -101,20 +103,24 @@ public class EventService {
                     if(region != Region.ALL)
                         eventMap = eventRepository.findAllByStartAtBetweenAndRegionOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.of(2099, 12, 31), region.code)
                             .stream()
+                            .filter(event -> event.getTotalFund() > 0)
                             .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
                     else
                         eventMap = eventRepository.findAllByStartAtBetweenOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.parse(eventEndDate, formatter))
                             .stream()
+                            .filter(event -> event.getTotalFund() > 0)
                             .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
                 }
             else {
                 if(region != Region.ALL)
                     eventMap = eventRepository.findAllByStartAtBetweenAndRegionOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.parse(eventEndDate, formatter), region.code)
                         .stream()
+                        .filter(event -> event.getTotalFund() > 0)
                         .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
                 else
                     eventMap = eventRepository.findAllByStartAtBetweenOrderByStartAtDesc(pageable, LocalDate.parse(eventStartDate, formatter), LocalDate.parse(eventEndDate, formatter))
                         .stream()
+                        .filter(event -> event.getTotalFund() > 0)
                         .collect(HashMap::new, (map, event) -> map.put(event.getId(), event), HashMap::putAll);
             }
 
@@ -126,10 +132,6 @@ public class EventService {
                         .firstimage(eventEntity.getImageUrl())
                         .addr1(eventEntity.getPlace())
                         .build();
-
-                    List<SessionDto> sessionDtos = eventEntity.getSessions().stream()
-                        .map(SessionDto::from)  // SessionDto.of(entity) 사용하여 변환
-                        .toList();
 
                     return new GetEventResponse(festivalDto, null, null, null, EventDto.from(eventEntity), true);
                 })
@@ -166,6 +168,13 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
+    public List<FestivalDto> listFestivalsByKeyword(int numOfRows, int pageNo, String keyword) {
+        List<FestivalDto> festivals = openApiService.listFestivalDetailsByKeyword(numOfRows, pageNo, EventSort.TITLE, keyword);
+
+        return festivals;
+    }
+
+    @Transactional(readOnly = true)
     public List<GetEventResponse> listEventsNearby(int numOfRows, int pageNo, String mapX, String mapY, String radius) {
         List<FestivalDto> festivals = openApiService.listNearbyFestival(numOfRows, pageNo, mapX, mapY, radius);
 
@@ -182,13 +191,11 @@ public class EventService {
             .map(festival -> {
                 Optional<EventEntity> event = Optional.ofNullable(eventMap.get(festival.getContentid()));
 
-                Boolean isValid1 = event.map(eventEntity -> eventEntity.getStartAt().isBefore(LocalDate.now()) && eventEntity.getEndAt().isAfter(LocalDate.now())).orElse(false);
+                Boolean isValid1 = event.map(
+                        eventEntity -> (eventEntity.getStartAt().isBefore(LocalDate.now()) && eventEntity.getEndAt().isAfter(LocalDate.now())) || eventEntity.getTotalFund() > 0)
+                        .orElse(false);
 
                 return event.map(eventEntity -> {
-                    List<SessionDto> sessionDtos = eventEntity.getSessions().stream()
-                        .map(SessionDto::from)
-                        .toList();
-
                     return new GetEventResponse(festival, null, null, null, EventDto.from(eventEntity), isValid1);
                 }).orElseGet(() ->
                         new GetEventResponse(festival, null, null, null, null, false));
@@ -197,17 +204,27 @@ public class EventService {
     }
 
     @Transactional
-    public EventDto createEvent(CreateEventRequest request) {
+    public EventDto createEvent(String email, CreateEventRequest request) {
+        HostEntity host = hostRepository.findByUser(userRepository.findByEmail(email))
+            .orElseThrow(() -> new IllegalArgumentException("호스트로 등록되지 않은 유저입니다."));
+
+        eventRepository.findById(request.getId())
+            .ifPresent(event -> {
+                throw new IllegalArgumentException("이미 등록된 이벤트입니다.");
+            });
+
         FestivalDto festivalDto = openApiService.getFestivalDetail(request.getId());
 
         FestivalIntroDto festivalIntroDto = openApiService.getFestivalDetailIntro(request.getId());
 
         EventEntity event = EventEntity.builder()
             .id(festivalDto.getContentid())
+            .host(host)
             .name(request.getName())
             .place(festivalDto.getAddr1())
             .ratio(request.getRatio())
             .region(festivalDto.getAreacode().toString())
+            .totalFund(0)
             .startAt(LocalDate.parse(festivalIntroDto.getEventstartdate(), formatter))
             .endAt(LocalDate.parse(festivalIntroDto.getEventenddate(), formatter))
             .imageUrl(festivalDto.getFirstimage())
@@ -227,6 +244,9 @@ public class EventService {
         event.setPlace(request.getPlace());
         event.setRatio(request.getRatio());
         event.setCreatedAt(LocalDateTime.now());
+
+        if (request.getFund() != null)
+            event.setTotalFund(event.getTotalFund() + request.getFund());
 
         EventEntity updatedEvent = eventRepository.save(event);
 
@@ -252,11 +272,12 @@ public class EventService {
             events = eventRepository.findAllByIdIn(eventIds)
                     .stream()
                     .filter(event -> event.getEndAt().isAfter(LocalDate.now()))
+                    .filter(event -> event.getTotalFund() > 0)
                     .toList();
         else
             events = eventRepository.findAllByIdIn(eventIds)
                     .stream()
-                    .filter(event -> event.getEndAt().isBefore(LocalDate.now()))
+                    .filter(event -> event.getEndAt().isBefore(LocalDate.now()) || event.getTotalFund() <= 0)
                     .toList();
 
         return events.stream()
@@ -270,8 +291,7 @@ public class EventService {
         HostEntity host = hostRepository.findByUser(user)
             .orElseThrow(() -> new IllegalArgumentException("호스트로 등록되지 않은 유저입니다."));
 
-        PageRequest pageable = PageRequest.of(0, 10, Sort.by("createAt").descending());
-        Page<EventEntity> events = eventRepository.findAllByHost(pageable, host);
+        List<EventEntity> events = eventRepository.findAllByHost(host);
 
         return events.stream()
                 .map(EventDto::from)

@@ -30,12 +30,12 @@ public class PointController {
 
     @Operation(summary = "유저의 포인트 내역 조회", description = "유저의 적립 및 사용 내역을 10개씩 반환합니다.(무한 스크롤), amount가 양수면 적립, 음수면 사용을 의미합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "포인트 내역을 정상적으로 반환", content =
-            @Content(array = @ArraySchema(schema = @Schema(implementation = PointDto.class)))
-            ),
-            @ApiResponse(responseCode = "204", description = "더 이상 포인트 내역이 존재하지 않음",
-                content = @Content(schema = @Schema(implementation = Null.class))
-            )
+        @ApiResponse(responseCode = "200", description = "포인트 내역을 정상적으로 반환", content =
+        @Content(array = @ArraySchema(schema = @Schema(implementation = PointDto.class)))
+        ),
+        @ApiResponse(responseCode = "204", description = "더 이상 포인트 내역이 존재하지 않음",
+            content = @Content(schema = @Schema(implementation = Null.class))
+        )
     })
     @GetMapping("/list")
     public ResponseEntity<Page<PointDto>> getPointList(Authentication authentication, @RequestParam(defaultValue = "0") int pageNo, HttpServletRequest request) {
