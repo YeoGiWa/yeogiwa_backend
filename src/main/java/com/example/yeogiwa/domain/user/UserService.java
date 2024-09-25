@@ -24,9 +24,7 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public Optional<UserEntity> getUser(Long id) {
-//        if (userRepository.existsByOauth2Id(email))
             return userRepository.findById(id);
-//        return null;
     }
 
     public LoginResponseDto login(LoginDto loginDto) {
