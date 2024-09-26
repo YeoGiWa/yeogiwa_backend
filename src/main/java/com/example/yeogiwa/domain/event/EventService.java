@@ -5,7 +5,6 @@ import com.example.yeogiwa.domain.ambassador.AmbassadorRepository;
 import com.example.yeogiwa.domain.event.dto.*;
 import com.example.yeogiwa.domain.host.HostEntity;
 import com.example.yeogiwa.domain.host.HostRepository;
-import com.example.yeogiwa.domain.host.HostService;
 import com.example.yeogiwa.domain.user.UserEntity;
 import com.example.yeogiwa.domain.user.UserRepository;
 import com.example.yeogiwa.enums.EventSort;
@@ -16,7 +15,6 @@ import com.example.yeogiwa.openapi.dto.FestivalDto;
 import com.example.yeogiwa.openapi.dto.FestivalIntroDto;
 import com.example.yeogiwa.openapi.OpenApiService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -205,7 +203,7 @@ public class EventService {
 
     @Transactional
     public EventDto createEvent(String email, CreateEventRequest request) {
-        HostEntity host = hostRepository.findByUser(userRepository.findByEmail(email))
+        HostEntity host = hostRepository.findAllByUserAndId(userRepository.findByEmail(email), request.getHostId())
             .orElseThrow(() -> new IllegalArgumentException("호스트로 등록되지 않은 유저입니다."));
 
         eventRepository.findById(request.getId())
@@ -288,10 +286,9 @@ public class EventService {
     @Transactional(readOnly = true)
     public List<EventDto> listEventsByHost(String email) {
         UserEntity user = userRepository.findByEmail(email);
-        HostEntity host = hostRepository.findByUser(user)
-            .orElseThrow(() -> new IllegalArgumentException("호스트로 등록되지 않은 유저입니다."));
+        List<HostEntity> hosts = hostRepository.findAllByUser(user);
 
-        List<EventEntity> events = eventRepository.findAllByHost(host);
+        List<EventEntity> events = eventRepository.findAllByHostIn(hosts);
 
         return events.stream()
                 .map(EventDto::from)
