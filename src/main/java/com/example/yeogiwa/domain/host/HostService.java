@@ -6,6 +6,7 @@ import com.example.yeogiwa.domain.host.dto.CreateHostRequest;
 import com.example.yeogiwa.domain.host.dto.HostDto;
 import com.example.yeogiwa.domain.user.UserEntity;
 import com.example.yeogiwa.domain.user.UserRepository;
+import com.example.yeogiwa.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class HostService {
     private final HostRepository hostRepository;
     private final UserRepository userRepository;
-    private final EventRepository eventRepository;
 
     @Transactional
     public HostDto createHost(String email, CreateHostRequest request) {
@@ -26,7 +26,9 @@ public class HostService {
             .build();
 
         // TODO: 실제로는 request 내용 저장하고 있어야 함
+        user.setRole(Role.ROLE_ADMIN);
 
+        userRepository.save(user);
         hostRepository.save(host);
 
         return HostDto.from(host);
