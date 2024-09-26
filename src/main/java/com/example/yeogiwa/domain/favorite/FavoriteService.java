@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class FavoriteService {
 
     private final FavoriteRepository favoriteRepository;
@@ -25,7 +26,6 @@ public class FavoriteService {
         this.eventRepository = eventRepository;
     }
 
-    @Transactional
     public FavoriteDto addFavorite(Long userId, String eventId) {
         EventEntity event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found with ID"));
@@ -48,7 +48,6 @@ public class FavoriteService {
         return FavoriteDto.from(savedFavorite);
     }
 
-    @Transactional
     public void removeFavorite(Long favoriteId) {
         FavoriteEntity favorite = favoriteRepository.findById(favoriteId)
                 .orElseThrow(() -> new IllegalArgumentException("Favorite not found with ID"));
@@ -63,7 +62,6 @@ public class FavoriteService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
     public FavoriteDto getFavorite(Long userId, String eventId) {
         EventEntity event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found with ID"));
