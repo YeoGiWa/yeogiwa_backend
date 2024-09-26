@@ -20,6 +20,9 @@ public class CreateEventRequest {
     @Schema(description = "8자리의 행사 ID", example = "25413323")
     private String id;
 
+    @Schema(description = "호스트 ID", example = "1")
+    private Long hostId;
+
     @Schema(description = "행사 이름", example = "서울국제빵과자페스티벌")
     private String name;
 
