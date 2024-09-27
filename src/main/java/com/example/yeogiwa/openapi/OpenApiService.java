@@ -1,34 +1,43 @@
 package com.example.yeogiwa.openapi;
 
+import com.example.yeogiwa.domain.host.dto.CreateHostBody;
 import com.example.yeogiwa.enums.Region;
 import com.example.yeogiwa.enums.EventSort;
-import com.example.yeogiwa.openapi.dto.response.FestivalResponse;
-import com.example.yeogiwa.openapi.dto.FestivalInfoDto;
-import com.example.yeogiwa.openapi.dto.FestivalImageDto;
-import com.example.yeogiwa.openapi.dto.FestivalIntroDto;
-import com.example.yeogiwa.openapi.dto.FestivalDto;
+import com.example.yeogiwa.openapi.business.BusinessApiClient;
+import com.example.yeogiwa.openapi.business.dto.response.BusinessRequestBody;
+import com.example.yeogiwa.openapi.business.dto.response.BusinessResponse;
+import com.example.yeogiwa.openapi.business.dto.response.BusinessStatus;
+import com.example.yeogiwa.openapi.festival.FestivalApiClient;
+import com.example.yeogiwa.openapi.festival.dto.response.FestivalResponse;
+import com.example.yeogiwa.openapi.festival.dto.FestivalInfoDto;
+import com.example.yeogiwa.openapi.festival.dto.FestivalImageDto;
+import com.example.yeogiwa.openapi.festival.dto.FestivalIntroDto;
+import com.example.yeogiwa.openapi.festival.dto.FestivalDto;
 import feign.codec.DecodeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class OpenApiService {
 
-    private final OpenApiClient openApiClient;
+    private final FestivalApiClient festivalApiClient;
+    private final BusinessApiClient businessApiClient;
 
-    @Value("${openapi.secret-key}") private String serviceKey;
+    @Value("${openapi.festival-secret-key}") private String festivalServiceKey;
+    @Value("${openapi.business-secret-key}") private String businessServiceKey;
 
     public List<FestivalDto> listFestivalDetails(int numOfRows, int pageNo, Region region, String eventStartDate, String eventEndDate) {
         FestivalResponse<FestivalDto> response = null;
         try {
             String regionCode = region == Region.ALL ? null : region.code;
 
-            response = openApiClient.listFestival(numOfRows, pageNo, "ETC", "test", "json",
-                "Y", EventSort.CREATING.type, regionCode, eventStartDate, eventEndDate, serviceKey);
+            response = festivalApiClient.listFestival(numOfRows, pageNo, "ETC", "test", "json",
+                "Y", EventSort.CREATING.type, regionCode, eventStartDate, eventEndDate, festivalServiceKey);
         } catch (DecodeException e) {
             return null;
         }
@@ -43,8 +52,8 @@ public class OpenApiService {
     public List<FestivalDto> listFestivalDetailsByKeyword(int numOfRows, int pageNo, EventSort eventSort, String keyword) {
         FestivalResponse<FestivalDto> response = null;
         try {
-            response = openApiClient.listFestivalByKeyword(numOfRows, pageNo, "ETC", "test", "json",
-                "Y", eventSort.type, keyword, "15", serviceKey);
+            response = festivalApiClient.listFestivalByKeyword(numOfRows, pageNo, "ETC", "test", "json",
+                "Y", eventSort.type, keyword, "15", festivalServiceKey);
         } catch(DecodeException e) {
             return null;
         }
@@ -59,8 +68,8 @@ public class OpenApiService {
     public List<FestivalDto> listNearbyFestival(int numOfRows, int pageNo, String mapX, String mapY, String radius) {
         FestivalResponse<FestivalDto> response = null;
         try {
-            response = openApiClient.listNearbyFestival(numOfRows, pageNo, "ETC", "test", "json",
-                "Y", EventSort.CREATING.type, mapX, mapY, radius, "15", serviceKey);
+            response = festivalApiClient.listNearbyFestival(numOfRows, pageNo, "ETC", "test", "json",
+                "Y", EventSort.CREATING.type, mapX, mapY, radius, "15", festivalServiceKey);
         } catch(DecodeException e) {
             return null;
         }
@@ -75,7 +84,7 @@ public class OpenApiService {
     public FestivalDto getFestivalDetail(String contentId) {
         FestivalResponse<FestivalDto> response = null;
         try {
-            response = openApiClient.getFestivalDetail("ETC", "test", "json", contentId,"Y","Y","Y","Y","Y","Y","Y", "15", serviceKey);
+            response = festivalApiClient.getFestivalDetail("ETC", "test", "json", contentId,"Y","Y","Y","Y","Y","Y","Y", "15", festivalServiceKey);
         } catch (DecodeException e) {
             e.printStackTrace();
             throw new RuntimeException("Invalid format");
@@ -93,7 +102,7 @@ public class OpenApiService {
     public FestivalIntroDto getFestivalDetailIntro(String contentId) {
         FestivalResponse<FestivalIntroDto> response = null;
         try {
-            response = openApiClient.getFestivalDetailIntro("ETC", "test", "json", contentId,"15", serviceKey);
+            response = festivalApiClient.getFestivalDetailIntro("ETC", "test", "json", contentId,"15", festivalServiceKey);
         } catch (DecodeException e) {
             return null;
         }
@@ -110,7 +119,7 @@ public class OpenApiService {
     public List<FestivalInfoDto> getFestivalDetailInfo(String contentId) {
         FestivalResponse<FestivalInfoDto> response = null;
         try {
-            response = openApiClient.getFestivalDetailInfo("ETC", "test", "json", contentId,"15", serviceKey);
+            response = festivalApiClient.getFestivalDetailInfo("ETC", "test", "json", contentId,"15", festivalServiceKey);
         } catch (DecodeException e) {
             return null;
         }
@@ -127,7 +136,7 @@ public class OpenApiService {
     public List<FestivalImageDto> getFestivalDetailImage(String contentId) {
         FestivalResponse<FestivalImageDto> response = null;
         try {
-            response = openApiClient.getFestivalDetailImage("ETC", "test", "json", "Y", "Y", contentId, serviceKey);
+            response = festivalApiClient.getFestivalDetailImage("ETC", "test", "json", "Y", "Y", contentId, festivalServiceKey);
         } catch (DecodeException e) {
             return null;
         }
@@ -139,5 +148,22 @@ public class OpenApiService {
         }
 
         return null;
+    }
+
+    public Boolean isValidBusiness(String businessNumber) {
+        List<BusinessStatus> businesses = new ArrayList<>();
+        try {
+            List<String> reqBusinesses = new ArrayList<String>();
+            reqBusinesses.add(businessNumber);
+            BusinessRequestBody requestBody = new BusinessRequestBody(reqBusinesses);
+            BusinessResponse response = businessApiClient.businessStatus(businessServiceKey, requestBody);
+            businesses = response.getData();
+        } catch (DecodeException e) {
+            return false;
+        }
+        for (BusinessStatus business: businesses) {
+            if (!business.getB_stt_cd().equals("01")) return false;
+        }
+        return true;
     }
 }

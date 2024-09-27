@@ -1,16 +1,16 @@
-package com.example.yeogiwa.openapi;
+package com.example.yeogiwa.openapi.festival;
 
-import com.example.yeogiwa.openapi.dto.response.FestivalResponse;
-import com.example.yeogiwa.openapi.dto.FestivalInfoDto;
-import com.example.yeogiwa.openapi.dto.FestivalImageDto;
-import com.example.yeogiwa.openapi.dto.FestivalDto;
-import com.example.yeogiwa.openapi.dto.FestivalIntroDto;
+import com.example.yeogiwa.openapi.festival.dto.response.FestivalResponse;
+import com.example.yeogiwa.openapi.festival.dto.FestivalInfoDto;
+import com.example.yeogiwa.openapi.festival.dto.FestivalImageDto;
+import com.example.yeogiwa.openapi.festival.dto.FestivalDto;
+import com.example.yeogiwa.openapi.festival.dto.FestivalIntroDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "openApiClient", url = "https://apis.data.go.kr/B551011/KorService1")
-public interface OpenApiClient {
+@FeignClient(name = "festivalApiClient", url = "https://apis.data.go.kr/B551011/KorService1")
+public interface FestivalApiClient {
     @GetMapping("/searchFestival1")
     FestivalResponse<FestivalDto> listFestival(
         @RequestParam("numOfRows") int numOfRows,

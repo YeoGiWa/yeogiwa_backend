@@ -2,22 +2,15 @@ package com.example.yeogiwa.domain.ambassador;
 
 import com.example.yeogiwa.domain.ambassador.dto.AmbassadorDto;
 import com.example.yeogiwa.domain.ambassador.dto.CreateAmbassadorRequest;
-import com.example.yeogiwa.domain.event.dto.EventDto;
-import com.example.yeogiwa.domain.event.dto.GetEventResponse;
-import com.example.yeogiwa.domain.event.dto.SessionDto;
 import com.example.yeogiwa.domain.user.UserEntity;
 import com.example.yeogiwa.domain.user.UserRepository;
 import com.example.yeogiwa.domain.event.EventEntity;
 import com.example.yeogiwa.domain.event.EventRepository;
-import com.example.yeogiwa.openapi.dto.FestivalDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service

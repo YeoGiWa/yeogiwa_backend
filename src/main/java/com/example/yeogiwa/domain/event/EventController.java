@@ -1,7 +1,6 @@
 package com.example.yeogiwa.domain.event;
 
 import com.example.yeogiwa.auth.oauth.PrincipalDetails;
-import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
 import com.example.yeogiwa.domain.event.dto.*;
 import com.example.yeogiwa.domain.session.SessionEntity;
 import com.example.yeogiwa.domain.session.SessionService;
@@ -11,7 +10,7 @@ import com.example.yeogiwa.domain.user.dto.UserDto;
 import com.example.yeogiwa.enums.Region;
 import com.example.yeogiwa.domain.event.dto.CreateEventRequest;
 import com.example.yeogiwa.domain.event.dto.GetEventResponse;
-import com.example.yeogiwa.openapi.dto.FestivalDto;
+import com.example.yeogiwa.openapi.festival.dto.FestivalDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

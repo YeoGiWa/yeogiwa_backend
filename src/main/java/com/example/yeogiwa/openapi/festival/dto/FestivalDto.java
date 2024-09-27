@@ -1,4 +1,4 @@
-package com.example.yeogiwa.openapi.dto;
+package com.example.yeogiwa.openapi.festival.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

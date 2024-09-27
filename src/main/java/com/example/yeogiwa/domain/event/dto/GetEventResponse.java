@@ -1,9 +1,9 @@
 package com.example.yeogiwa.domain.event.dto;
 
-import com.example.yeogiwa.openapi.dto.FestivalInfoDto;
-import com.example.yeogiwa.openapi.dto.FestivalImageDto;
-import com.example.yeogiwa.openapi.dto.FestivalDto;
-import com.example.yeogiwa.openapi.dto.FestivalIntroDto;
+import com.example.yeogiwa.openapi.festival.dto.FestivalInfoDto;
+import com.example.yeogiwa.openapi.festival.dto.FestivalImageDto;
+import com.example.yeogiwa.openapi.festival.dto.FestivalDto;
+import com.example.yeogiwa.openapi.festival.dto.FestivalIntroDto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;

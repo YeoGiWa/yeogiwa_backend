@@ -33,7 +33,7 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (!jwtUtil.substringToken(accessToken).equals("test") && !jwtUtil.validateToken(jwtUtil.substringToken(accessToken))) {
+        if (!jwtUtil.validateToken(jwtUtil.substringToken(accessToken))) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
@@ -41,12 +41,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = jwtUtil.substringToken(accessToken);
         if (token==null) { return; }
 
-        Long id = null;
-        if(token.equals("test")) {
-            id = 1L;
-        } else {
-            id = jwtUtil.getId(token);
-        }
+        Long id = jwtUtil.getId(token);
 
         UserEntity user = null;
         try {

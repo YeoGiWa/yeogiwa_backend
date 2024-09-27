@@ -1,4 +1,4 @@
-package com.example.yeogiwa.openapi.dto.response;
+package com.example.yeogiwa.openapi.festival.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

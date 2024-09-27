@@ -42,7 +42,6 @@ public class UserController {
         PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
         Optional<UserEntity> opUser = userService.getUser(user.getUserId());
         UserDto userDto = UserDto.from(opUser);
-        log.info("optional User: {}", userDto);
         return ResponseEntity.status(200).body(userDto);
     }
 
