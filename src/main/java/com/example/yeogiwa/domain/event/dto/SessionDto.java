@@ -1,6 +1,5 @@
 package com.example.yeogiwa.domain.event.dto;
 
-import com.example.yeogiwa.domain.session.SessionEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,13 +26,13 @@ public class SessionDto {
     private LocalDateTime createdAt;
 
 
-    public static SessionDto from(SessionEntity sessionEntity) {
-        return SessionDto.builder()
-                .id(sessionEntity.getId())
-                .count(sessionEntity.getCount())
-                .startDate(sessionEntity.getStartDate())
-                .startTime(sessionEntity.getStartTime())
-                .createdAt(sessionEntity.getCreatedAt())
-                .build();
-    }
+//    public static SessionDto from(SessionEntity sessionEntity) {
+//        return SessionDto.builder()
+//                .id(sessionEntity.getId())
+//                .count(sessionEntity.getCount())
+//                .startDate(sessionEntity.getStartDate())
+//                .startTime(sessionEntity.getStartTime())
+//                .createdAt(sessionEntity.getCreatedAt())
+//                .build();
+//    }
 }

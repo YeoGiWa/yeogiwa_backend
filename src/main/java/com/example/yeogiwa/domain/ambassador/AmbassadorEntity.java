@@ -1,8 +1,9 @@
 package com.example.yeogiwa.domain.ambassador;
 
+import com.example.yeogiwa.domain.event.EventEntity;
 import com.example.yeogiwa.domain.promoted.PromotedEntity;
 import com.example.yeogiwa.domain.user.UserEntity;
-import com.example.yeogiwa.domain.event.EventEntity;
+import com.example.yeogiwa.domain.event.OldEventEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -13,10 +14,8 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.lang.NonNull;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 

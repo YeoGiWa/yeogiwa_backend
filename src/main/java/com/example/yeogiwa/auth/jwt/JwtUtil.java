@@ -8,20 +8,20 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Base64;
 import java.util.Date;
 
 @Component
 @Slf4j
 public class JwtUtil {
     private final SecretKey key;
-
-    public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
 
     public JwtUtil(@Value("${spring.jwt.secret}") String secretKey) {
@@ -41,18 +41,37 @@ public class JwtUtil {
             .compact();
     }
 
-    public boolean validateToken(String token) {
+    public String createAccessToken(Long userId, String role) {
+        return createToken(
+            "access",
+            userId,
+            role,
+            1 * 60 * 60 * 1000L // 1 hour
+        );
+    }
+
+    public String createRefreshToken(Long userId, String role) {
+        return createToken(
+            "refresh",
+            userId,
+            role,
+            14 * 24 * 60 * 60 * 1000L // 2 weeks
+        );
+    }
+
+    public boolean validateToken(String token) throws JwtException {
         try {
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
             return true;
         } catch (SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT Token", e);
-        } catch (ExpiredJwtException e) {
-            log.info("Expired JWT Token", e);
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT Token", e);
         } catch (IllegalArgumentException e) {
             log.info("JWT claims string is empty", e);
+        } catch (ExpiredJwtException e) {
+            log.info("Expired JWT Token", e);
+            throw new ExpiredJwtException(e.getHeader(), e.getClaims(), e.getMessage(), e.getCause());
         }
         return false;
     }
@@ -66,18 +85,31 @@ public class JwtUtil {
     }
 
     public void addJwtToHeader(String token, HttpServletResponse res) {
-        res.addHeader(AUTHORIZATION_HEADER, token);
+        res.addHeader(HttpHeaders.AUTHORIZATION, token);
     }
 
     public void addJwtToCookie(String token, HttpServletResponse res) {
-        try {
-            token = URLEncoder.encode(token, "UTF-8").replaceAll("\\+", "%20");
-            Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);
-            cookie.setPath("/");
-            res.addCookie(cookie);
-        } catch (UnsupportedEncodingException e) {
-            log.info("{}", e.getMessage());
-        }
+        Cookie cookie = new Cookie(
+            "refresh",
+            Base64.getEncoder().encodeToString(token.getBytes())
+        );
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setMaxAge(14 * 24 * 60 * 60 * 1000);
+        res.addCookie(cookie);
+    }
+
+    public void removeJwtCookie(HttpServletResponse res) {
+        Cookie cookie = new Cookie(
+            "refresh",
+            null
+        );
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setMaxAge(0);
+        res.addCookie(cookie);
     }
 
     public String substringToken(String tokenValue) {
@@ -90,5 +122,4 @@ public class JwtUtil {
     public Long getId(String token) {
         return parseClaims(token).get("id", Long.class);
     }
-
 }

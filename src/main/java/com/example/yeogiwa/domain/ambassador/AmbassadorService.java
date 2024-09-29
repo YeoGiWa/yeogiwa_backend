@@ -2,10 +2,12 @@ package com.example.yeogiwa.domain.ambassador;
 
 import com.example.yeogiwa.domain.ambassador.dto.AmbassadorDto;
 import com.example.yeogiwa.domain.ambassador.dto.CreateAmbassadorRequest;
-import com.example.yeogiwa.domain.user.UserEntity;
-import com.example.yeogiwa.domain.user.UserRepository;
 import com.example.yeogiwa.domain.event.EventEntity;
 import com.example.yeogiwa.domain.event.EventRepository;
+import com.example.yeogiwa.domain.user.UserEntity;
+import com.example.yeogiwa.domain.user.UserRepository;
+import com.example.yeogiwa.domain.event.OldEventEntity;
+import com.example.yeogiwa.domain.event.OldEventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,11 +50,11 @@ public class AmbassadorService {
     }
 
     @Transactional(readOnly = true)
-    public List<AmbassadorDto> listAmbassadorsByEvent(String eventId) {
+    public List<AmbassadorDto> listAmbassadorsByEvent(Long eventId) {
         EventEntity event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
-        List<AmbassadorEntity> ambassadorEntities = ambassadorRepository.findAllByEvent(event);
+        List<AmbassadorEntity> ambassadorEntities = ambassadorRepository.findAllByEvent_Id(eventId);
 
         return ambassadorEntities.stream()
                 .map(AmbassadorDto::from)

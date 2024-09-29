@@ -5,35 +5,32 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class FestivalDto {
-    private String overview;
-    private Long contentid;
-    private Short sigungucode;
+    private String addr1;
+    private String addr2;
+    private String booktour;
     private String cat1;
     private String cat2;
     private String cat3;
-    private String addr1;
-    private String addr2;
-    private Integer zipcode;
-    private Double mapx;
-    private Double mapy;
-    private Short mlevel;
-    private String cpyrhtDivCd;
-    private Integer contenttypeid;
-    private String booktour;
+    private Long contentid;
+    private String contenttypeid;
     private String createdtime;
-    private String homepage;
-    private String modifiedtime;
-    private String tel;
-    private String telname;
-    private String title;
+    private Double dist;
+    private String eventstartdate;
+    private String eventenddate;
     private String firstimage;
     private String firstimage2;
-    private Integer areacode;
+    private String cpyrhtDivCd;
+    private Double mapx;
+    private Double mapy;
+    private Integer mlevel;
+    private String modifiedtime;
+    private String areacode;
+    private String sigungucode;
+    private String tel;
+    private String title;
 }

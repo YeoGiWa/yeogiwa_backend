@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.CookieValue;
 
 @Configuration
 @OpenAPIDefinition(
@@ -23,7 +24,8 @@ import org.springframework.context.annotation.Configuration;
             "profile_nickname",
             "profile_image",
             "account_email"
-        })
+        }),
+        @SecurityRequirement(name = "refresh")
     },
     servers = @Server(
         url = "/"
@@ -50,6 +52,11 @@ import org.springframework.context.annotation.Configuration;
         type = SecuritySchemeType.HTTP,
         scheme = "bearer",
         bearerFormat = "JWT"
+    ),
+    @SecurityScheme(
+        name = "refresh",
+        type = SecuritySchemeType.APIKEY,
+        in = SecuritySchemeIn.COOKIE
     )
 })
 public class SwaggerConfig {

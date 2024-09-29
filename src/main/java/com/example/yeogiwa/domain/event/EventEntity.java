@@ -3,17 +3,11 @@ package com.example.yeogiwa.domain.event;
 import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
 import com.example.yeogiwa.domain.host.HostEntity;
 import com.example.yeogiwa.domain.promoted.PromotedEntity;
-import com.example.yeogiwa.domain.session.SessionEntity;
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.*;
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,13 +35,7 @@ public class EventEntity {
 
     /* Columns */
     @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
-    private String place;
-
-    @Column(nullable = false)
-    private int ratio;
+    private Integer ratio;
 
     @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
@@ -55,16 +43,6 @@ public class EventEntity {
     @Column(nullable = false, insertable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     @Builder.Default
     private Boolean isDeleted = false;
-
-    private LocalDate startAt;
-
-    private LocalDate endAt;
-
-    private String imageUrl;
-
-    private String region;
-
-    private Integer totalFund;
 
     /* Related */
     @OneToMany(mappedBy = "event")
@@ -74,8 +52,4 @@ public class EventEntity {
     @OneToMany(mappedBy = "event")
     @Builder.Default
     private List<PromotedEntity> promotes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "event")
-    @Builder.Default
-    private List<SessionEntity> sessions = new ArrayList<>();
 }

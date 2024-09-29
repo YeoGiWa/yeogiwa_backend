@@ -1,6 +1,6 @@
 package com.example.yeogiwa.domain.favorite;
 
-import com.example.yeogiwa.domain.event.EventEntity;
+import com.example.yeogiwa.domain.event.OldEventEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -11,5 +11,5 @@ public interface FavoriteRepository extends JpaRepository<FavoriteEntity, Long> 
 
     List<FavoriteEntity> findByUserId(Long userId);
 
-    Optional<FavoriteEntity> findByUserIdAndEvent(Long userId, EventEntity event);
+    Optional<FavoriteEntity> findByUserIdAndEvent_Id(Long userId, Long eventId);
 }

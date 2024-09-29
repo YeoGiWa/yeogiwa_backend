@@ -2,7 +2,7 @@ package com.example.yeogiwa.domain.event.dto;
 
 import com.example.yeogiwa.openapi.festival.dto.FestivalInfoDto;
 import com.example.yeogiwa.openapi.festival.dto.FestivalImageDto;
-import com.example.yeogiwa.openapi.festival.dto.FestivalDto;
+import com.example.yeogiwa.openapi.festival.dto.FestivalCommonDto;
 import com.example.yeogiwa.openapi.festival.dto.FestivalIntroDto;
 import lombok.Builder;
 import lombok.Data;
@@ -14,15 +14,15 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 public class GetEventResponse {
-    private FestivalDto festivalDto;
+    private FestivalCommonDto festivalCommonDto;
     private FestivalIntroDto festivalIntroDto;
     private List<FestivalInfoDto> festivalInfoDtos;
     private List<FestivalImageDto> festivalImageDtos;
     private EventDto event;
     private Boolean isValid;
 
-    public GetEventResponse(FestivalDto festivalDto, FestivalIntroDto festivalIntroDto, List<FestivalInfoDto> festivalInfoDtos, List<FestivalImageDto> festivalImageDtos, EventDto event, Boolean isValid) {
-        this.festivalDto = festivalDto;
+    public GetEventResponse(FestivalCommonDto festivalCommonDto, FestivalIntroDto festivalIntroDto, List<FestivalInfoDto> festivalInfoDtos, List<FestivalImageDto> festivalImageDtos, EventDto event, Boolean isValid) {
+        this.festivalCommonDto = festivalCommonDto;
         this.festivalIntroDto = festivalIntroDto;
         this.festivalInfoDtos = festivalInfoDtos;
         this.festivalImageDtos = festivalImageDtos;

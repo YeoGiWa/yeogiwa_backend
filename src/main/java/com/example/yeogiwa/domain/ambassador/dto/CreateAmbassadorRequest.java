@@ -14,5 +14,5 @@ import java.util.Date;
 @Builder
 public class CreateAmbassadorRequest {
     @Schema(description = "8자리의 행사 ID", example = "25413323")
-    private String eventId;
+    private Long eventId;
 }

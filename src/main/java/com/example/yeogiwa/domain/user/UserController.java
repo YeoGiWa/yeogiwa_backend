@@ -89,6 +89,7 @@ public class UserController {
             "refresh",
                 Base64.getEncoder().encodeToString(result.getRefreshToken().getBytes())
             )
+            .path("/")
             .httpOnly(true)
             .secure(true)
             .maxAge(14 * 24 * 60 * 60 * 1000L) // 2 weeks

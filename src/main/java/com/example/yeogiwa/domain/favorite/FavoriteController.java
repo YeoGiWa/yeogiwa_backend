@@ -31,7 +31,7 @@ public class FavoriteController {
             @ApiResponse(responseCode = "404", description = "사용자 또는 이벤트를 찾을 수 없음", content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping()
-    public Long addFavorite(Authentication authentication, @RequestParam String eventId) {
+    public Long addFavorite(Authentication authentication, @RequestParam Long eventId) {
         PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
         FavoriteDto favorite = favoriteService.addFavorite(user.getUserId(), eventId);
         return favorite.getId();
@@ -65,7 +65,7 @@ public class FavoriteController {
             @ApiResponse(responseCode = "404", description = "즐겨찾기를 찾을 수 없음", content = @Content(schema = @Schema(implementation = String.class)))
     })
     @GetMapping("/event/{eventId}")
-    public ResponseEntity<FavoriteDto> getFavorite(Authentication authentication, @PathVariable String eventId) {
+    public ResponseEntity<FavoriteDto> getFavorite(Authentication authentication, @PathVariable Long eventId) {
         PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
         FavoriteDto favorite = favoriteService.getFavorite(user.getUserId(), eventId);
         return ResponseEntity.status(200).body(favorite);

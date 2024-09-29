@@ -1,6 +1,9 @@
 package com.example.yeogiwa.openapi;
 
-import com.example.yeogiwa.domain.host.dto.CreateHostBody;
+import com.example.yeogiwa.domain.event.EventEntity;
+import com.example.yeogiwa.domain.event.EventRepository;
+import com.example.yeogiwa.domain.event.dto.response.EventDetailResponse;
+import com.example.yeogiwa.domain.event.dto.response.EventsResponse;
 import com.example.yeogiwa.enums.Region;
 import com.example.yeogiwa.enums.EventSort;
 import com.example.yeogiwa.openapi.business.BusinessApiClient;
@@ -8,152 +11,130 @@ import com.example.yeogiwa.openapi.business.dto.response.BusinessRequestBody;
 import com.example.yeogiwa.openapi.business.dto.response.BusinessResponse;
 import com.example.yeogiwa.openapi.business.dto.response.BusinessStatus;
 import com.example.yeogiwa.openapi.festival.FestivalApiClient;
-import com.example.yeogiwa.openapi.festival.dto.response.FestivalResponse;
-import com.example.yeogiwa.openapi.festival.dto.FestivalInfoDto;
-import com.example.yeogiwa.openapi.festival.dto.FestivalImageDto;
-import com.example.yeogiwa.openapi.festival.dto.FestivalIntroDto;
-import com.example.yeogiwa.openapi.festival.dto.FestivalDto;
+import com.example.yeogiwa.openapi.festival.dto.*;
 import feign.codec.DecodeException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
+@Slf4j
 public class OpenApiService {
 
     private final FestivalApiClient festivalApiClient;
     private final BusinessApiClient businessApiClient;
+    private final EventRepository eventRepository;
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     @Value("${openapi.festival-secret-key}") private String festivalServiceKey;
     @Value("${openapi.business-secret-key}") private String businessServiceKey;
 
-    public List<FestivalDto> listFestivalDetails(int numOfRows, int pageNo, Region region, String eventStartDate, String eventEndDate) {
-        FestivalResponse<FestivalDto> response = null;
-        try {
-            String regionCode = region == Region.ALL ? null : region.code;
+    public EventDetailResponse getFestival(Long eventId) {
+        if (eventId == null) throw new HttpClientErrorException(HttpStatusCode.valueOf(400));
 
-            response = festivalApiClient.listFestival(numOfRows, pageNo, "ETC", "test", "json",
-                "Y", EventSort.CREATING.type, regionCode, eventStartDate, eventEndDate, festivalServiceKey);
+        try {
+            FestivalCommonDto festivalCommonDto = festivalApiClient.detailCommon("ETC", "test", "json", eventId.toString(),"Y","Y","Y","Y","Y","Y","Y", "15", festivalServiceKey)
+                .getResponse().getBody().getItems().getItem().get(0);
+            FestivalIntroDto festivalIntroDto = festivalApiClient.detailIntro("ETC", "test", "json", eventId.toString(), "15", festivalServiceKey)
+                .getResponse().getBody().getItems().getItem().get(0);
+            Optional<EventEntity> event = eventRepository.findById(eventId);
+            return EventDetailResponse.from(eventId, festivalCommonDto, festivalIntroDto, event);
         } catch (DecodeException e) {
-            return null;
+            throw new HttpClientErrorException(HttpStatusCode.valueOf(404));
         }
-
-        if (response != null && response.getResponse().getBody() != null && response.getResponse().getBody().getItems() != null) {
-            return response.getResponse().getBody().getItems().getItem();
-        }
-
-        return null;
     }
 
-    public List<FestivalDto> listFestivalDetailsByKeyword(int numOfRows, int pageNo, EventSort eventSort, String keyword) {
-        FestivalResponse<FestivalDto> response = null;
-        try {
-            response = festivalApiClient.listFestivalByKeyword(numOfRows, pageNo, "ETC", "test", "json",
-                "Y", eventSort.type, keyword, "15", festivalServiceKey);
-        } catch(DecodeException e) {
-            return null;
-        }
+    public List<EventsResponse> getFestivals(Integer numOfRows, Integer pageNo, String keyword, Region region, String eventStartDate, String eventEndDate) {
+        // searchFestival: 날짜 + 지역 검색 지원
+        // searchKeyword: 검색어 + 지역 검색 지원
 
-        if (response != null && response.getResponse().getBody() != null && response.getResponse().getBody().getItems() != null) {
-            return response.getResponse().getBody().getItems().getItem();
+        // 0. 아무 필터도 없을 때
+        // 1. 검색어
+        // 2. 검색어(무시) + 지역
+        // 3. 검색어(무시) + 날짜
+        // 4. 검색어(무시) + 지역 + 날짜
+        // 5. 지역
+        // 6. 지역 + 날짜
+        // 7. 날짜
+        if (numOfRows==null || pageNo==null) throw new HttpClientErrorException(HttpStatusCode.valueOf(400));
+        if (keyword != null && region == null && eventStartDate == null && eventEndDate == null) {
+            // 1. 검색어 - Logic
+            // 1) searchKeyword로 검색어 필터링 해 축제 목록 가져오기
+            // 2) 축제 목록에서 ID만 뽑아내기
+            // 3) DB에 해당 ID를 가진 event들이 있는지 가져오기
+            // 4) detailIntro로 개별 축제 정보 가져오기: startDate, endDate 가져오기
+            // 5) 데이터를 필요한 형태로 가공해 return 하기
+            List<FestivalCommonDto> result;
+            try {
+                result = festivalApiClient.searchKeyword(numOfRows, pageNo, "ETC", "test", "json", "Y", EventSort.CREATE_AT.name(), keyword, "15", festivalServiceKey)
+                    .getResponse().getBody().getItems().getItem();
+            } catch (DecodeException e) {
+                throw new HttpClientErrorException(HttpStatusCode.valueOf(204));
+            }
+            List<Long> ids = result.stream().map(FestivalCommonDto::getContentid).collect(Collectors.toList());
+            List<Long> events = eventRepository.findAllById(ids).stream().map(EventEntity::getId).toList();
+            return result.stream().map(
+                festival -> {
+                    FestivalIntroDto detailResult = festivalApiClient.detailIntro("ETC", "test", "json", festival.getContentid().toString(), "15", festivalServiceKey)
+                        .getResponse().getBody().getItems().getItem().get(0);
+                    return EventsResponse.from(festival, events, detailResult);
+                }
+            ).toList();
+        } else {
+            // 0., 2.~7. - Logic
+            // 1) searchFesival로 지역/날짜 필터링 해 축제 목록 가져오기
+            // 2) 축제 목록에서 ID만 뽑아내기
+            // 3) DB에 해당 ID를 가진 event들이 있는지 가져오기
+            // 4) 데이터를 필요한 형태로 가공해 return 하기
+            List<FestivalDto> result;
+            try {
+                result = festivalApiClient.searchFestival(numOfRows, pageNo, "ETC", "test", "json", "Y", EventSort.CREATE_AT.name(), region != null ? region.code : null, eventStartDate != null ? eventStartDate : LocalDate.now().format(dateTimeFormatter), eventEndDate, festivalServiceKey)
+                    .getResponse().getBody().getItems().getItem();
+            } catch (DecodeException e) {
+                throw new HttpClientErrorException(HttpStatusCode.valueOf(204));
+            }
+            List<Long> ids = result.stream().map(FestivalDto::getContentid).collect(Collectors.toList());
+            List<Long> events = eventRepository.findAllById(ids).stream().map(EventEntity::getId).toList();
+            return result.stream().map(
+                festival -> EventsResponse.from(festival, events)
+            ).toList();
         }
-
-        return null;
     }
 
-    public List<FestivalDto> listNearbyFestival(int numOfRows, int pageNo, String mapX, String mapY, String radius) {
-        FestivalResponse<FestivalDto> response = null;
-        try {
-            response = festivalApiClient.listNearbyFestival(numOfRows, pageNo, "ETC", "test", "json",
-                "Y", EventSort.CREATING.type, mapX, mapY, radius, "15", festivalServiceKey);
-        } catch(DecodeException e) {
-            return null;
+    public List<EventsResponse> getNearbyFestivals(Integer numofRows, Integer pageNo, Double mapX, Double mapY, Double radius) {
+        if (numofRows==null || pageNo==null || mapX==null || mapY==null || radius==null || 0>radius || radius>20000) {
+            throw new HttpClientErrorException(HttpStatusCode.valueOf(400));
         }
-
-        if (response != null && response.getResponse().getBody() != null && response.getResponse().getBody().getItems() != null) {
-            return response.getResponse().getBody().getItems().getItem();
-        }
-
-        return null;
-    }
-
-    public FestivalDto getFestivalDetail(String contentId) {
-        FestivalResponse<FestivalDto> response = null;
+        List<FestivalDto> results;
         try {
-            response = festivalApiClient.getFestivalDetail("ETC", "test", "json", contentId,"Y","Y","Y","Y","Y","Y","Y", "15", festivalServiceKey);
+            results = festivalApiClient.locationBasedList(numofRows, pageNo, "ETC", "test", "json", "Y", EventSort.CREATE_AT.name(), mapX.toString(), mapY.toString(), radius.toString(), "15", festivalServiceKey)
+                .getResponse().getBody().getItems().getItem();
         } catch (DecodeException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Invalid format");
+            throw new HttpClientErrorException(HttpStatusCode.valueOf(204));
         }
 
-        if (response != null && response.getResponse().getBody() != null && response.getResponse().getBody().getItems() != null) {
-            List<FestivalDto> item = response.getResponse().getBody().getItems().getItem();
-
-            return item.get(0);
-        }
-
-        return null;
-    }
-
-    public FestivalIntroDto getFestivalDetailIntro(String contentId) {
-        FestivalResponse<FestivalIntroDto> response = null;
-        try {
-            response = festivalApiClient.getFestivalDetailIntro("ETC", "test", "json", contentId,"15", festivalServiceKey);
-        } catch (DecodeException e) {
-            return null;
-        }
-
-        if (response != null && response.getResponse().getBody() != null && response.getResponse().getBody().getItems() != null) {
-            List<FestivalIntroDto> item = response.getResponse().getBody().getItems().getItem();
-
-            return item.get(0);
-        }
-
-        return null;
-    }
-
-    public List<FestivalInfoDto> getFestivalDetailInfo(String contentId) {
-        FestivalResponse<FestivalInfoDto> response = null;
-        try {
-            response = festivalApiClient.getFestivalDetailInfo("ETC", "test", "json", contentId,"15", festivalServiceKey);
-        } catch (DecodeException e) {
-            return null;
-        }
-
-        if (response != null && response.getResponse().getBody() != null && response.getResponse().getBody().getItems() != null) {
-            List<FestivalInfoDto> item = response.getResponse().getBody().getItems().getItem();
-
-            return item;
-        }
-
-        return null;
-    }
-
-    public List<FestivalImageDto> getFestivalDetailImage(String contentId) {
-        FestivalResponse<FestivalImageDto> response = null;
-        try {
-            response = festivalApiClient.getFestivalDetailImage("ETC", "test", "json", "Y", "Y", contentId, festivalServiceKey);
-        } catch (DecodeException e) {
-            return null;
-        }
-
-        if (response != null && response.getResponse().getBody() != null && response.getResponse().getBody().getItems() != null) {
-            List<FestivalImageDto> item = response.getResponse().getBody().getItems().getItem();
-
-            return item;
-        }
-
-        return null;
+        List<Long> ids = results.stream().map(FestivalDto::getContentid).toList();
+        List<Long> events = eventRepository.findAllById(ids).stream().map(EventEntity::getId).toList();
+        return results.stream().map(
+            festival -> EventsResponse.from(festival, events)
+        ).toList();
     }
 
     public Boolean isValidBusiness(String businessNumber) {
-        List<BusinessStatus> businesses = new ArrayList<>();
+        List<BusinessStatus> businesses;
         try {
-            List<String> reqBusinesses = new ArrayList<String>();
+            List<String> reqBusinesses = new ArrayList<>();
             reqBusinesses.add(businessNumber);
             BusinessRequestBody requestBody = new BusinessRequestBody(reqBusinesses);
             BusinessResponse response = businessApiClient.businessStatus(businessServiceKey, requestBody);

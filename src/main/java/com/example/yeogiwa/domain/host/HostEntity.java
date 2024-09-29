@@ -1,6 +1,7 @@
 package com.example.yeogiwa.domain.host;
 
 import com.example.yeogiwa.domain.event.EventEntity;
+import com.example.yeogiwa.domain.event.OldEventEntity;
 import com.example.yeogiwa.domain.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -13,7 +14,6 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -33,7 +33,7 @@ public class HostEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", unique = true)
     private UserEntity user;
 
     /* Columns */

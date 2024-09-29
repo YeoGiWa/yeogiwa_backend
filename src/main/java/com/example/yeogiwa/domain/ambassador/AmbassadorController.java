@@ -3,6 +3,7 @@ package com.example.yeogiwa.domain.ambassador;
 import com.example.yeogiwa.auth.oauth.PrincipalDetails;
 import com.example.yeogiwa.domain.ambassador.dto.AmbassadorDto;
 import com.example.yeogiwa.domain.ambassador.dto.CreateAmbassadorRequest;
+import com.example.yeogiwa.domain.event.dto.EventDto;
 import com.example.yeogiwa.domain.user.UserEntity;
 import com.example.yeogiwa.domain.user.UserService;
 import com.example.yeogiwa.domain.user.dto.UserDto;
@@ -25,7 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/ambassadors")
+@RequestMapping("/ambassador")
 @ResponseBody
 @RequiredArgsConstructor
 @Tag(name = "🤵‍ 앰배서더 API", description = "앰배서더 관련 API")
@@ -47,16 +48,15 @@ public class AmbassadorController {
     }
 
     @GetMapping("/events")
-    @Operation(summary = "특정 축제의 앰배서더 목록 조회", description = "해당 행사/축제의 앰배서더 목록 조회")
+    @Operation(summary = "앰배서더 홍보 목록 조회", description = "해당 유저가 홍보하고 있는 행사/축제 목록 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "행사/축제의 앰배서더 목록을 성공적으로 조회한 경우", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AmbassadorEntity.class)))),
-            @ApiResponse(responseCode = "400", description = "오류가 발생해 행사/축제의 앰배서더 목록을 조회하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 행사/축제인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
+        @ApiResponse(responseCode = "200", description = "유저가 홍보중인 행사/축제 목록을 성공적으로 조회한 경우", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EventDto.class)))),
+        @ApiResponse(responseCode = "400", description = "오류가 발생해 유저가 홍보중인 행사/축제 목록을 조회하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
+        @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 유저이거나 탈퇴한 유저인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
     })
-    public ResponseEntity<List<AmbassadorDto>> getAmbassadorList(@Parameter(description = "앰버서더를 조회할 행사의 ID입니다.", example = "12345678") @RequestParam(name = "eventId", defaultValue = "12345678") String eventId) {
-        List<AmbassadorDto> ambassadors = ambassadorService.listAmbassadorsByEvent(eventId);
-
-        return ResponseEntity.status(200).body(ambassadors);
+    public ResponseEntity<?> getAmbassadorsOfEvent(Authentication authentication) {
+        return null;
     }
 
     @PostMapping

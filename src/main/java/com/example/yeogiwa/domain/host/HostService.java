@@ -1,7 +1,5 @@
 package com.example.yeogiwa.domain.host;
 
-import com.example.yeogiwa.domain.event.EventEntity;
-import com.example.yeogiwa.domain.event.EventRepository;
 import com.example.yeogiwa.domain.host.dto.CreateHostBody;
 import com.example.yeogiwa.domain.host.dto.HostDto;
 import com.example.yeogiwa.domain.user.UserEntity;
@@ -16,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
-import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +23,6 @@ import java.sql.SQLIntegrityConstraintViolationException;
 public class HostService {
     private final HostRepository hostRepository;
     private final UserRepository userRepository;
-    private final EventRepository eventRepository;
     private final OpenApiService openApiService;
 
     public HostDto createHost(Long userId, CreateHostBody body) {
@@ -48,18 +45,16 @@ public class HostService {
 
             user.setRole(Role.ROLE_ADMIN);
             userRepository.save(user);
-
-            for (Long eventId: body.getEventId()) {
-                EventEntity event = EventEntity.builder()
-
-                    .build();
-                eventRepository.save(event);
-            }
-
         } catch (DataIntegrityViolationException e) {
             throw new HttpClientErrorException(HttpStatusCode.valueOf(409));
         }
 
         return HostDto.from(host);
+    }
+
+    public List<Long> createHostEvents(Long userId, List<Long> eventIds) {
+        Boolean isHostExist = hostRepository.existsByUser_Id(userId);
+        if (!isHostExist) throw new HttpClientErrorException(HttpStatusCode.valueOf(404));
+        return null;
     }
 }

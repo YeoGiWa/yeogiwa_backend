@@ -49,18 +49,8 @@ public class UserService {
         );
 
         /* Issue tokens */
-        String accessToken = jwtUtil.createToken(
-            "access",
-            user.getId(),
-            user.getRole().name(),
-            1 * 60 * 60 * 1000L // 1 hour
-        );
-        String refreshToken = jwtUtil.createToken(
-            "refresh",
-            user.getId(),
-            user.getRole().name(),
-            14 * 24 * 60 * 60 * 1000L // 2 weeks
-        );
+        String accessToken = jwtUtil.createAccessToken(user.getId(), user.getRole().name());
+        String refreshToken = jwtUtil.createRefreshToken(user.getId(), user.getRole().name());
 
         loginResponseDto.setUserId(user.getId());
         loginResponseDto.setAccessToken(accessToken);
