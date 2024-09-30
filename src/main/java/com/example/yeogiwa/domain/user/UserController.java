@@ -1,5 +1,6 @@
 package com.example.yeogiwa.domain.user;
 
+import com.example.yeogiwa.auth.jwt.JwtUtil;
 import com.example.yeogiwa.auth.oauth.PrincipalDetails;
 import com.example.yeogiwa.domain.user.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +30,7 @@ import java.util.UUID;
 @Slf4j
 public class UserController {
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @GetMapping("/")
     @Operation(summary = "유저 정보 조회", description = "유저의 상세 정보를 반환")
@@ -75,7 +77,24 @@ public class UserController {
                 break;
             }
             case "apple": {
-                break;
+                RestTemplate request = new RestTemplate();
+                String url = "https://appleid.apple.com/auth/oauth2/v2/token";
+                HttpHeaders requestHeader = new HttpHeaders();
+                requestHeader.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                String appleClientSecret = jwtUtil.createAppleClientSecret();
+                AppleRequestBodyDto requestBody = new AppleRequestBodyDto(jwtUtil.getClientId(), appleClientSecret, loginDto.getToken());
+                log.info("apple token: {}", requestBody.getRefresh_token());
+                try {
+                    ResponseEntity<AppleDto> appleDto = request.exchange(
+                        url,
+                        HttpMethod.POST,
+                        new HttpEntity<>(requestBody, requestHeader),
+                        AppleDto.class
+                    );
+                } catch (HttpClientErrorException e) {
+                    // if token is not valid, return 401
+                    return ResponseEntity.status(401).body(null);
+                }
             }
             default: return ResponseEntity.status(401).body(null);
         }
