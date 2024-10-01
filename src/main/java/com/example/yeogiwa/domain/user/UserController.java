@@ -36,9 +36,9 @@ public class UserController {
     @Operation(summary = "유저 정보 조회", description = "유저의 상세 정보를 반환")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "유저의 상세 정보를 정상적으로 반환한 경우"),
-            @ApiResponse(responseCode = "400", description = "에러가 발생해 유저의 상세 정보를 반환하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
-            @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
-            @ApiResponse(responseCode = "404", description = "이미 탈퇴한 유저인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
+            @ApiResponse(responseCode = "400", description = "에러가 발생해 유저의 상세 정보를 반환하지 못한 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+            @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+            @ApiResponse(responseCode = "404", description = "이미 탈퇴한 유저인 경우", content = @Content(schema = @Schema(implementation = Null.class)))
     })
     public ResponseEntity<UserDto> getUser(Authentication authentication) {
         PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
@@ -78,24 +78,25 @@ public class UserController {
                 break;
             }
             case "apple": {
-                RestTemplate request = new RestTemplate();
-                String url = "https://appleid.apple.com/auth/oauth2/v2/token";
-                HttpHeaders requestHeader = new HttpHeaders();
-                requestHeader.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                String appleClientSecret = jwtUtil.createAppleClientSecret();
-                AppleRequestBodyDto requestBody = new AppleRequestBodyDto(jwtUtil.getClientId(), appleClientSecret, loginDto.getToken());
-                log.info("apple token: {}", requestBody.getRefresh_token());
-                try {
-                    ResponseEntity<AppleDto> appleDto = request.exchange(
-                        url,
-                        HttpMethod.POST,
-                        new HttpEntity<>(requestBody, requestHeader),
-                        AppleDto.class
-                    );
-                } catch (HttpClientErrorException e) {
-                    // if token is not valid, return 401
-                    return ResponseEntity.status(401).body(null);
-                }
+//                RestTemplate request = new RestTemplate();
+//                String url = "https://appleid.apple.com/auth/oauth2/v2/token";
+//                HttpHeaders requestHeader = new HttpHeaders();
+//                requestHeader.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//                String appleClientSecret = jwtUtil.createAppleClientSecret();
+//                AppleRequestBodyDto requestBody = new AppleRequestBodyDto(jwtUtil.getClientId(), appleClientSecret, loginDto.getToken());
+//                log.info("apple token: {}", requestBody.getRefresh_token());
+//                try {
+//                    ResponseEntity<AppleDto> appleDto = request.exchange(
+//                        url,
+//                        HttpMethod.POST,
+//                        new HttpEntity<>(requestBody, requestHeader),
+//                        AppleDto.class
+//                    );
+//                } catch (HttpClientErrorException e) {
+//                    // if token is not valid, return 401
+//                    return ResponseEntity.status(401).body(null);
+//                }
+                break;
             }
             default: return ResponseEntity.status(401).body(null);
         }

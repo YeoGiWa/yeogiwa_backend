@@ -24,7 +24,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/festival")
+@RequestMapping("/event")
 @RequiredArgsConstructor
 @Tag(name = "🎆 이벤트 API", description = "이벤트 관련 API")
 public class EventController {
