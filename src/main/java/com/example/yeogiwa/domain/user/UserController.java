@@ -1,6 +1,6 @@
 package com.example.yeogiwa.domain.user;
 
-import com.example.yeogiwa.auth.jwt.JwtUtil;
+import com.example.yeogiwa.util.JwtUtil;
 import com.example.yeogiwa.auth.oauth.PrincipalDetails;
 import com.example.yeogiwa.domain.user.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,7 +20,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Base64;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/user")

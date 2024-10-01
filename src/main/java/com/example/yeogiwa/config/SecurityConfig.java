@@ -1,9 +1,8 @@
 package com.example.yeogiwa.config;
 
-import com.example.yeogiwa.auth.jwt.JwtFilter;
-import com.example.yeogiwa.auth.jwt.JwtUtil;
+import com.example.yeogiwa.auth.JwtFilter;
+import com.example.yeogiwa.util.JwtUtil;
 import com.example.yeogiwa.domain.user.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,11 +13,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatchers;
-
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity

@@ -1,6 +1,7 @@
 spring:
   application:
-  name: yeogiwa
+    name: yeogiwa
+    base-url: ${BASE_URL}
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

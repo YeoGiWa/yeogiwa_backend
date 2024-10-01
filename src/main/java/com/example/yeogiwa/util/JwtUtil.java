@@ -1,4 +1,4 @@
-package com.example.yeogiwa.auth.jwt;
+package com.example.yeogiwa.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;

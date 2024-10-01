@@ -32,7 +32,6 @@ import java.util.UUID;
 @Tag(name = "🤵‍ 앰배서더 API", description = "앰배서더 관련 API")
 public class AmbassadorController {
     private final AmbassadorService ambassadorService;
-    private final UserService userService;
 
     @GetMapping("/{id}")
     @Operation(summary = "앰배서더 조회", description = "해당 앰배서더의 정보 조회")
@@ -57,25 +56,5 @@ public class AmbassadorController {
     })
     public ResponseEntity<?> getAmbassadorsOfEvent(Authentication authentication) {
         return null;
-    }
-
-    @PostMapping
-    @Operation(summary = "앰배서더 등록", description = "행사/축제의 앰배서더로 등록")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "앰배서더로 등록 성공", content = @Content(schema = @Schema(implementation = AmbassadorEntity.class))),
-            @ApiResponse(responseCode = "400", description = "앰배서더로 등록 실패", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
-            @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 행사/축제인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
-    })
-    public ResponseEntity<AmbassadorDto> registerAmbassador(Authentication authentication, @RequestBody CreateAmbassadorRequest request) {
-        // TODO: 토큰에서 가져오기
-        PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
-        Optional<UserEntity> opUser = userService.getUser(user.getUserId());
-        UserDto userDto = UserDto.from(opUser);
-        String email = userDto.getEmail();
-
-        AmbassadorDto ambassador = ambassadorService.createAmbassador(email, request);
-
-        return ResponseEntity.status(200).body(ambassador);
     }
 }

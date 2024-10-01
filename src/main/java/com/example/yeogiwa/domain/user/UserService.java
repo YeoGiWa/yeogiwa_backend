@@ -1,6 +1,6 @@
 package com.example.yeogiwa.domain.user;
 
-import com.example.yeogiwa.auth.jwt.JwtUtil;
+import com.example.yeogiwa.util.JwtUtil;
 import com.example.yeogiwa.domain.user.dto.LoginDto;
 import com.example.yeogiwa.domain.user.dto.LoginResponseDto;
 import com.example.yeogiwa.domain.user.dto.RegisterDTO;
@@ -13,7 +13,6 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.security.SecureRandom;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Transactional

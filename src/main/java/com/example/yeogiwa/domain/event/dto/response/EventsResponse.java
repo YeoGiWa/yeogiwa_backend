@@ -1,5 +1,6 @@
 package com.example.yeogiwa.domain.event.dto.response;
 
+import com.example.yeogiwa.domain.event.dto.EventEtc;
 import com.example.yeogiwa.openapi.festival.dto.FestivalCommonDto;
 import com.example.yeogiwa.openapi.festival.dto.FestivalDto;
 import com.example.yeogiwa.openapi.festival.dto.FestivalIntroDto;
@@ -22,12 +23,13 @@ public class EventsResponse {
     private String address;
     private String eventStartDate;
     private String eventEndDate;
+    private Integer round;
     private Double mapX;
     private Double mapY;
     private Double dist;
     private Boolean isApplicable;
 
-    public static EventsResponse from(FestivalDto festival, Map<Long, Boolean> isApplicable) {
+    public static EventsResponse from(FestivalDto festival, Map<Long, EventEtc> eventEtc) {
         return EventsResponse.builder()
             .eventId(festival.getContentid())
             .thumbnailImage(festival.getFirstimage())
@@ -35,14 +37,15 @@ public class EventsResponse {
             .address(festival.getAddr1())
             .eventStartDate(festival.getEventstartdate())
             .eventEndDate(festival.getEventenddate())
+            .round(eventEtc.getOrDefault(festival.getContentid(), EventEtc.builder().build()).getRound())
             .mapX(festival.getMapx())
             .mapY(festival.getMapy())
             .dist(festival.getDist())
-            .isApplicable(isApplicable.get(festival.getContentid()))
+            .isApplicable(eventEtc.get(festival.getContentid()) != null ? eventEtc.get(festival.getContentid()).getIsApplicable() : false)
             .build();
     }
 
-    public static EventsResponse from(FestivalCommonDto festival, Map<Long, Boolean> isApplicable, FestivalIntroDto detailResult) {
+    public static EventsResponse from(FestivalCommonDto festival, FestivalIntroDto detailResult, Map<Long, EventEtc> eventEtc) {
         return EventsResponse.builder()
             .eventId(festival.getContentid())
             .thumbnailImage(festival.getFirstimage())
@@ -50,9 +53,10 @@ public class EventsResponse {
             .address(festival.getAddr1())
             .eventStartDate(detailResult.getEventstartdate())
             .eventEndDate(detailResult.getEventenddate())
+            .round(eventEtc.getOrDefault(festival.getContentid(), EventEtc.builder().build()).getRound())
             .mapX(festival.getMapx())
             .mapY(festival.getMapy())
-            .isApplicable(isApplicable.get(festival.getContentid()))
+            .isApplicable(eventEtc.get(festival.getContentid())!=null ? eventEtc.get(festival.getContentid()).getIsApplicable() : false)
             .build();
     }
 }

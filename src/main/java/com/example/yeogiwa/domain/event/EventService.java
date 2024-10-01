@@ -14,7 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class EventService {
-    private final EventRepository eventRepository;
     private final OpenApiService openApiService;
 
     public EventDetailResponse getEventDetailById(Long eventId) {

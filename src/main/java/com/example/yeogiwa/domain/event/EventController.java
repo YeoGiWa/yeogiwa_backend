@@ -1,6 +1,8 @@
 package com.example.yeogiwa.domain.event;
 
+import com.example.yeogiwa.auth.oauth.PrincipalDetails;
 import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
+import com.example.yeogiwa.domain.ambassador.AmbassadorService;
 import com.example.yeogiwa.domain.ambassador.dto.AmbassadorDto;
 import com.example.yeogiwa.domain.event.dto.EventDto;
 import com.example.yeogiwa.domain.event.dto.request.UpdateEventDto;
@@ -18,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -29,6 +32,7 @@ import java.util.List;
 @Tag(name = "🎆 이벤트 API", description = "이벤트 관련 API")
 public class EventController {
     private final EventService eventService;
+    private final AmbassadorService ambassadorService;
 
     @Operation(summary = "특정 축제/행사 정보 조회", description = "특정 이벤트의 상세 정보를 반환")
     @ApiResponses(value = {
@@ -139,5 +143,21 @@ public class EventController {
 
 //        return ResponseEntity.status(200).body(ambassadors);
         return null;
+    }
+
+    @PostMapping("/{eventId}/ambassador")
+    @Operation(summary = "특정 축제의 앰배서더 생성", description = "해당 행사/축제의 앰배서더 생성")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "행사/축제의 앰배서더를 성공적으로 생성한 경우", content = @Content(schema = @Schema(implementation = Long.class))),
+        @ApiResponse(responseCode = "400", description = "오류가 발생해 행사/축제의 앰배서더를 생성하지 못한 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "401", description = "로그인하지 않은 사용자인 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "403", description = "해당 행사/축제가 활성화되지 않은 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "404", description = "해당 ID의 행사/축제가 존재하지 않는 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "409", description = "이미 해당 행사/축제의 앰배서더가 된 경우", content = @Content(schema = @Schema(implementation = Null.class)))
+    })
+    public ResponseEntity<Long> createAmbassador(Authentication authentication, @PathVariable Long eventId) {
+        PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
+        Long newAmbassadorId = ambassadorService.createAmbassador(user.getUserId(), eventId);
+        return ResponseEntity.status(201).body(newAmbassadorId);
     }
 }

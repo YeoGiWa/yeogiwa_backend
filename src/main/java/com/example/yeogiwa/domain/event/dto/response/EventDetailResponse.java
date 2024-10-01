@@ -1,6 +1,7 @@
 package com.example.yeogiwa.domain.event.dto.response;
 
 import com.example.yeogiwa.domain.event.EventEntity;
+import com.example.yeogiwa.domain.event.dto.EventEtc;
 import com.example.yeogiwa.openapi.festival.dto.FestivalCommonDto;
 import com.example.yeogiwa.openapi.festival.dto.FestivalIntroDto;
 import lombok.AllArgsConstructor;
@@ -22,13 +23,14 @@ public class EventDetailResponse {
     private String address;
     private String eventStartDate;
     private String eventEndDate;
+    private Integer round;
     private String playtime;
     private String tel;
     private String telName;
     private String overview;
     private Boolean isApplicable;
 
-    public static EventDetailResponse from(Long eventId, FestivalCommonDto festivalCommonDto, FestivalIntroDto festivalIntroDto, Boolean isApplicable) {
+    public static EventDetailResponse from(Long eventId, FestivalCommonDto festivalCommonDto, FestivalIntroDto festivalIntroDto, EventEtc eventEtc) {
         return EventDetailResponse.builder()
             .eventId(eventId)
             .title(festivalCommonDto.getTitle())
@@ -37,11 +39,12 @@ public class EventDetailResponse {
             .address(festivalCommonDto.getAddr1())
             .eventStartDate(festivalIntroDto.getEventstartdate())
             .eventEndDate(festivalIntroDto.getEventenddate())
+            .round(eventEtc.getRound())
             .playtime(festivalIntroDto.getPlaytime())
             .tel(festivalCommonDto.getTel())
             .telName(festivalCommonDto.getTelname())
             .overview(festivalCommonDto.getOverview())
-            .isApplicable(isApplicable)
+            .isApplicable(eventEtc.getIsApplicable())
             .build();
     }
 }

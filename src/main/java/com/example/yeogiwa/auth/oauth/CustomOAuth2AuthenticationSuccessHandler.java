@@ -1,6 +1,6 @@
 package com.example.yeogiwa.auth.oauth;
 
-import com.example.yeogiwa.auth.jwt.JwtUtil;
+import com.example.yeogiwa.util.JwtUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -15,9 +15,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class AmbassadorDto {
-    private UUID id;
+    private Long id;
 
-    private String qr;
+    private byte[] qr;
 
     private LocalDateTime createdAt;
 
