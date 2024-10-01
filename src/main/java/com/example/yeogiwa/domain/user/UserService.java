@@ -28,6 +28,9 @@ public class UserService {
     }
 
     public LoginResponseDto login(LoginDto loginDto) {
+        if (loginDto.getRegistration() == null || loginDto.getRegistrationId() == null) {
+            throw new HttpClientErrorException(HttpStatusCode.valueOf(400));
+        }
         LoginResponseDto loginResponseDto = new LoginResponseDto();
         loginResponseDto.setStatus(200);
 

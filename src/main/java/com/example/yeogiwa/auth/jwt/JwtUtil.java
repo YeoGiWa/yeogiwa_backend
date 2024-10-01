@@ -44,7 +44,7 @@ public class JwtUtil {
         this.clientId = clientId;
         this.keyId = keyId;
         this.teamId = teamId;
-        this.privateKey = privateKey;
+        this.privateKey = new String(Base64.getDecoder().decode(privateKey));
         byte[] keyBytes = Decoders.BASE64URL.decode(key);
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }

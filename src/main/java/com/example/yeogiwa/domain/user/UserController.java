@@ -52,6 +52,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(schema = @Schema(implementation = Long.class))),
         @ApiResponse(responseCode = "201", description = "로그인 및 회원가입 성공", content = @Content(schema = @Schema(implementation = Long.class))),
+        @ApiResponse(responseCode = "400", description = "유저 식별 정보가 없이 요청을 보낸 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
         @ApiResponse(responseCode = "401", description = "잘못된 registration access 토큰", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class)))
     })
     public ResponseEntity<Long> login(@RequestBody LoginDto loginDto) {
