@@ -84,7 +84,7 @@ public class UserController {
 //                requestHeader.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 //                String appleClientSecret = jwtUtil.createAppleClientSecret();
 //                AppleRequestBodyDto requestBody = new AppleRequestBodyDto(jwtUtil.getClientId(), appleClientSecret, loginDto.getToken());
-//                log.info("apple token: {}", requestBody.getRefresh_token());
+//            :     log.info("apple token: {}", requestBody.getRefresh_token());
 //                try {
 //                    ResponseEntity<AppleDto> appleDto = request.exchange(
 //                        url,

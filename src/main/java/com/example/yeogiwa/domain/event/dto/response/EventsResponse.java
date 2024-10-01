@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -26,7 +27,7 @@ public class EventsResponse {
     private Double dist;
     private Boolean isApplicable;
 
-    public static EventsResponse from(FestivalDto festival, List<Long> events) {
+    public static EventsResponse from(FestivalDto festival, Map<Long, Boolean> isApplicable) {
         return EventsResponse.builder()
             .eventId(festival.getContentid())
             .thumbnailImage(festival.getFirstimage())
@@ -37,11 +38,11 @@ public class EventsResponse {
             .mapX(festival.getMapx())
             .mapY(festival.getMapy())
             .dist(festival.getDist())
-            .isApplicable(events.contains(festival.getContentid()))
+            .isApplicable(isApplicable.get(festival.getContentid()))
             .build();
     }
 
-    public static EventsResponse from(FestivalCommonDto festival, List<Long> events, FestivalIntroDto detailResult) {
+    public static EventsResponse from(FestivalCommonDto festival, Map<Long, Boolean> isApplicable, FestivalIntroDto detailResult) {
         return EventsResponse.builder()
             .eventId(festival.getContentid())
             .thumbnailImage(festival.getFirstimage())
@@ -51,7 +52,7 @@ public class EventsResponse {
             .eventEndDate(detailResult.getEventenddate())
             .mapX(festival.getMapx())
             .mapY(festival.getMapy())
-            .isApplicable(events.contains(festival.getContentid()))
+            .isApplicable(isApplicable.get(festival.getContentid()))
             .build();
     }
 }

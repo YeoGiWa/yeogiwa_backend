@@ -28,7 +28,7 @@ public class EventDetailResponse {
     private String overview;
     private Boolean isApplicable;
 
-    public static EventDetailResponse from(Long eventId, FestivalCommonDto festivalCommonDto, FestivalIntroDto festivalIntroDto, Optional<EventEntity> event) {
+    public static EventDetailResponse from(Long eventId, FestivalCommonDto festivalCommonDto, FestivalIntroDto festivalIntroDto, Boolean isApplicable) {
         return EventDetailResponse.builder()
             .eventId(eventId)
             .title(festivalCommonDto.getTitle())
@@ -41,7 +41,7 @@ public class EventDetailResponse {
             .tel(festivalCommonDto.getTel())
             .telName(festivalCommonDto.getTelname())
             .overview(festivalCommonDto.getOverview())
-            .isApplicable(event.isPresent())
+            .isApplicable(isApplicable)
             .build();
     }
 }

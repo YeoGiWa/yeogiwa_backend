@@ -55,6 +55,10 @@ public class EventEntity {
     @Column(nullable = false)
     private Integer ratio;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isApplicable = false;
+
     @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 

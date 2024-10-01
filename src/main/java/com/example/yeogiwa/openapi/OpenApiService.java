@@ -48,8 +48,8 @@ public class OpenApiService {
                 .getResponse().getBody().getItems().getItem().get(0);
             FestivalIntroDto festivalIntroDto = festivalApiClient.detailIntro("ETC", "test", "json", eventId.toString(), "15", festivalServiceKey)
                 .getResponse().getBody().getItems().getItem().get(0);
-            Optional<EventEntity> event = eventRepository.findById(eventId);
-            return EventDetailResponse.from(eventId, festivalCommonDto, festivalIntroDto, event);
+            EventEntity event = eventRepository.findById(eventId).get();
+            return EventDetailResponse.from(eventId, festivalCommonDto, festivalIntroDto, event.getIsApplicable());
         } catch (DecodeException e) {
             throw new HttpClientErrorException(HttpStatusCode.valueOf(404));
         }
@@ -83,12 +83,13 @@ public class OpenApiService {
                 throw new HttpClientErrorException(HttpStatusCode.valueOf(204));
             }
             List<Long> ids = result.stream().map(FestivalCommonDto::getContentid).collect(Collectors.toList());
-            List<Long> events = eventRepository.findAllById(ids).stream().map(EventEntity::getId).toList();
+            Map<Long, Boolean> isApplicable = new HashMap<>();
+            eventRepository.findAllById(ids).stream().map(event -> isApplicable.put(event.getId(), event.getIsApplicable()));
             return result.stream().map(
                 festival -> {
                     FestivalIntroDto detailResult = festivalApiClient.detailIntro("ETC", "test", "json", festival.getContentid().toString(), "15", festivalServiceKey)
                         .getResponse().getBody().getItems().getItem().get(0);
-                    return EventsResponse.from(festival, events, detailResult);
+                    return EventsResponse.from(festival, isApplicable, detailResult);
                 }
             ).toList();
         } else {
@@ -105,9 +106,10 @@ public class OpenApiService {
                 throw new HttpClientErrorException(HttpStatusCode.valueOf(204));
             }
             List<Long> ids = result.stream().map(FestivalDto::getContentid).collect(Collectors.toList());
-            List<Long> events = eventRepository.findAllById(ids).stream().map(EventEntity::getId).toList();
+            Map<Long, Boolean> isApplicable = new HashMap<>();
+            eventRepository.findAllById(ids).stream().map(event -> isApplicable.put(event.getId(), event.getIsApplicable()));
             return result.stream().map(
-                festival -> EventsResponse.from(festival, events)
+                festival -> EventsResponse.from(festival, isApplicable)
             ).toList();
         }
     }
@@ -125,9 +127,10 @@ public class OpenApiService {
         }
 
         List<Long> ids = results.stream().map(FestivalDto::getContentid).toList();
-        List<Long> events = eventRepository.findAllById(ids).stream().map(EventEntity::getId).toList();
+        Map<Long, Boolean> isApplicable = new HashMap<>();
+        eventRepository.findAllById(ids).stream().map(event -> isApplicable.put(event.getId(), event.getIsApplicable()));
         return results.stream().map(
-            festival -> EventsResponse.from(festival, events)
+            festival -> EventsResponse.from(festival, isApplicable)
         ).toList();
     }
 
