@@ -1,7 +1,6 @@
 package com.example.yeogiwa.domain.host;
 
 import com.example.yeogiwa.domain.event.EventEntity;
-import com.example.yeogiwa.domain.event.OldEventEntity;
 import com.example.yeogiwa.domain.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.Builder;

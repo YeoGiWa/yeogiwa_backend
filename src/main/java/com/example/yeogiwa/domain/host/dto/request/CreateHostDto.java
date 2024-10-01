@@ -1,6 +1,5 @@
-package com.example.yeogiwa.domain.host.dto;
+package com.example.yeogiwa.domain.host.dto.request;
 
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -8,16 +7,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateHostBody {
-    @ArraySchema(schema = @Schema(description = "8자리의 행사 ID", example = "25413323"))
-    private List<Long> eventId;
-
+public class CreateHostDto {
     @Schema(description = "주최자/주최기관명", example = "강릉문화원")
     private String name;
 

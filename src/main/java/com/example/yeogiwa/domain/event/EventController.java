@@ -3,8 +3,7 @@ package com.example.yeogiwa.domain.event;
 import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
 import com.example.yeogiwa.domain.ambassador.dto.AmbassadorDto;
 import com.example.yeogiwa.domain.event.dto.EventDto;
-import com.example.yeogiwa.domain.event.dto.GetEventResponse;
-import com.example.yeogiwa.domain.event.dto.UpdateEventRequest;
+import com.example.yeogiwa.domain.event.dto.request.UpdateEventDto;
 import com.example.yeogiwa.domain.event.dto.response.EventDetailResponse;
 import com.example.yeogiwa.domain.event.dto.response.EventsResponse;
 import com.example.yeogiwa.enums.Region;
@@ -19,7 +18,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -32,7 +30,7 @@ import java.util.List;
 public class EventController {
     private final EventService eventService;
 
-    @Operation(summary = "특정 이벤트 정보 조회", description = "특정 이벤트의 상세 정보를 반환")
+    @Operation(summary = "특정 축제/행사 정보 조회", description = "특정 이벤트의 상세 정보를 반환")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "이벤트의 정보를 정상적으로 반환", content = {
             @Content(schema = @Schema(implementation = EventDetailResponse.class))
@@ -50,7 +48,7 @@ public class EventController {
         return ResponseEntity.status(200).body(event);
     }
 
-    @Operation(summary = "이벤트 정보 검색", description = "검색한 이벤트들의 상세 정보를 반환")
+    @Operation(summary = "축제/행사 정보 검색", description = "검색한 이벤트들의 상세 정보를 반환")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "이벤트의 정보를 정상적으로 반환", content = {
             @Content(array = @ArraySchema(schema = @Schema(implementation = EventsResponse.class)))
@@ -76,11 +74,12 @@ public class EventController {
         return ResponseEntity.status(200).body(events);
     }
 
-    @Operation(summary = "근처 이벤트 정보 검색", description = "특정 장소 근처에 있는 이벤트들의 상세 정보를 반환")
+    @Operation(summary = "근처 축제/행사 정보 검색", description = "특정 장소 근처에 있는 이벤트들의 상세 정보를 반환")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "이벤트의 정보를 정상적으로 반환", content = {
-            @Content(array = @ArraySchema(schema = @Schema(implementation = GetEventResponse.class)))
+            @Content(array = @ArraySchema(schema = @Schema(implementation = EventsResponse.class)))
         }),
+        @ApiResponse(responseCode = "204", description = "더 이상 이벤트 정보가 없음", content = @Content(schema = @Schema(implementation = Null.class))),
         @ApiResponse(responseCode = "400", description = "오류로 인해 이벤트의 정보를 반환하지 못함", content = {
             @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))
         })
@@ -97,6 +96,7 @@ public class EventController {
         return ResponseEntity.status(200).body(results);
     }
 
+
     @Operation(summary = "이벤트 수정", description = "이벤트의 정보를 수정")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "이벤트를 정상적으로 수정", content = {
@@ -107,7 +107,8 @@ public class EventController {
         })
     })
     @PutMapping("/{eventId}")
-    public ResponseEntity<EventDto> updateEvent(@PathVariable String id, @RequestBody UpdateEventRequest request) {
+    public ResponseEntity<EventDto> updateEvent(@PathVariable String id, @RequestBody UpdateEventDto request) {
+
         return null;
     }
 
@@ -124,6 +125,7 @@ public class EventController {
     public ResponseEntity<Long> deleteEvent(@PathVariable String eventId) {
         return null;
     }
+
 
     @GetMapping("/ambassadors")
     @Operation(summary = "특정 축제의 앰배서더 목록 조회", description = "해당 행사/축제의 앰배서더 목록 조회")

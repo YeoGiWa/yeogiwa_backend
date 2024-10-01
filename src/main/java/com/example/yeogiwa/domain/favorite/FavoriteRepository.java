@@ -1,6 +1,5 @@
 package com.example.yeogiwa.domain.favorite;
 
-import com.example.yeogiwa.domain.event.OldEventEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

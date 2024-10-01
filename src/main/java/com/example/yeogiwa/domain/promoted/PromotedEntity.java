@@ -2,7 +2,6 @@ package com.example.yeogiwa.domain.promoted;
 
 import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
 import com.example.yeogiwa.domain.event.EventEntity;
-import com.example.yeogiwa.domain.event.OldEventEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;

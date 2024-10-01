@@ -30,10 +30,28 @@ public class EventEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "host_id")
+    @JoinColumn(name = "host_id", insertable = false, updatable = false)
     private HostEntity host;
 
+    @Column(name = "host_id")
+    private Long hostId;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "upper_event_id", insertable = false, updatable = false)
+    private EventEntity upperEvent;
+
+
+    @Column(name = "upper_event_id")
+    private Long upperEventId;
+
     /* Columns */
+    @Column
+    private String title;
+
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 1")
+    @Builder.Default
+    private Integer round = 1; // 회차
+
     @Column(nullable = false)
     private Integer ratio;
 
@@ -52,4 +70,8 @@ public class EventEntity {
     @OneToMany(mappedBy = "event")
     @Builder.Default
     private List<PromotedEntity> promotes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "id")
+    @Builder.Default
+    private List<EventEntity> lowerEvents = new ArrayList<>();
 }

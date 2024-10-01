@@ -1,14 +1,12 @@
 package com.example.yeogiwa.domain.event.dto;
 
-import com.example.yeogiwa.domain.event.OldEventEntity;
+import com.example.yeogiwa.domain.event.EventEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -16,51 +14,24 @@ import java.util.List;
 @Builder
 public class EventDto {
     private Long id;
-
-    private String name;
-
-    private String place;
-
-    private int ratio;
-
-    private LocalDate startAt;
-
-    private LocalDate endAt;
-
-    private String imageUrl;
-
-    private String region;
-
-    private Integer totalFund;
-
+    private Long host;
+    private Long upperEventId;
+    private String title;
+    private Integer round;
+    private Integer ratio;
     private LocalDateTime createdAt;
+    private Boolean isDeleted;
 
-    private List<SessionDto> sessions;
-
-//    private List<AmbassadorEntity> ambassadors = new ArrayList<>();
-//
-//    private List<PromotedEntity> promotes = new ArrayList<>();
-//
-//    private List<FundEntity> funds = new ArrayList<>();
-
-
-//    public static EventDto from(OldEventEntity event) {
-//        List<SessionDto> sessions = event.getSessions().stream()
-//            .map(SessionDto::from)
-//            .toList();
-//
-//        return EventDto.builder()
-//            .id(event.getId())
-//            .name(event.getName())
-//            .place(event.getPlace())
-//            .ratio(event.getRatio())
-//            .startAt(event.getStartAt())
-//            .endAt(event.getEndAt())
-//            .imageUrl(event.getImageUrl())
-//            .region(event.getRegion())
-//            .totalFund(event.getTotalFund())
-//            .createdAt(event.getCreatedAt())
-//            .sessions(sessions)
-//            .build();
-//    }
+    public static EventDto from(EventEntity event) {
+        return EventDto.builder()
+            .id(event.getId())
+            .host(event.getHostId())
+            .upperEventId(event.getUpperEventId())
+            .title(event.getTitle())
+            .round(event.getRound())
+            .ratio(event.getRatio())
+            .createdAt(event.getCreatedAt())
+            .isDeleted(event.getIsDeleted())
+            .build();
+    }
 }

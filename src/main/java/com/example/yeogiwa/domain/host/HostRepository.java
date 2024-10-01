@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface HostRepository extends JpaRepository<HostEntity, Long> {
-    Boolean existsByUser_Id(Long userId);
+    HostEntity findByUser_Id(Long userId);
 
     List<HostEntity> findAllByUser(UserEntity user);
 

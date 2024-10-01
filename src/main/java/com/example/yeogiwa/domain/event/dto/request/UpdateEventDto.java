@@ -1,4 +1,4 @@
-package com.example.yeogiwa.domain.event.dto;
+package com.example.yeogiwa.domain.event.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -6,14 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 // TODO: 추후 연관관계 추가
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UpdateEventRequest {
+public class UpdateEventDto {
 //    private HostEntity host;
 
     @Schema(description = "행사 이름", example = "서울국제빵과자페스티벌")

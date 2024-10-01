@@ -2,8 +2,6 @@ package com.example.yeogiwa.domain.favorite;
 
 import com.example.yeogiwa.domain.event.EventEntity;
 import com.example.yeogiwa.domain.event.EventRepository;
-import com.example.yeogiwa.domain.event.OldEventEntity;
-import com.example.yeogiwa.domain.event.OldEventRepository;
 import com.example.yeogiwa.domain.favorite.dto.FavoriteDto;
 import com.example.yeogiwa.domain.user.UserEntity;
 import com.example.yeogiwa.domain.user.UserRepository;
