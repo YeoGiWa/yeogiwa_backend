@@ -6,14 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// TODO: 추후 연관관계 추가
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class UpdateEventDto {
-//    private HostEntity host;
-
     @Schema(description = "행사 이름", example = "서울국제빵과자페스티벌")
     private String name;
 
@@ -25,10 +22,4 @@ public class UpdateEventDto {
 
     @Schema(description = "이벤트에 추가할 포인트", example = "1000")
     private Integer fund;
-
-//    private List<AmbassadorEntity> ambassadors = new ArrayList<>();
-//
-//    private List<PromotedEntity> promotes = new ArrayList<>();
-//
-//    private List<FundEntity> funds = new ArrayList<>();
 }

@@ -40,10 +40,10 @@ public class EventController {
             @Content(schema = @Schema(implementation = EventDetailResponse.class))
         }),
         @ApiResponse(responseCode = "400", description = "오류로 인해 이벤트의 정보를 반환하지 못함", content = {
-            @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))
+            @Content(schema = @Schema(implementation = Null.class))
         }),
         @ApiResponse(responseCode = "404", description = "해당 event_id를 갖는 행사가 존재하지 않음", content = {
-            @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class))
+            @Content(schema = @Schema(implementation = Null.class))
         })
     })
     @GetMapping("/{eventId}")
@@ -61,7 +61,7 @@ public class EventController {
             @Content(schema = @Schema(implementation = Null.class))
         }),
         @ApiResponse(responseCode = "400", description = "오류로 인해 이벤트의 정보를 반환하지 못함", content = {
-            @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))
+            @Content(schema = @Schema(implementation = Null.class))
         }),
     })
     @GetMapping("/list")
@@ -85,7 +85,7 @@ public class EventController {
         }),
         @ApiResponse(responseCode = "204", description = "더 이상 이벤트 정보가 없음", content = @Content(schema = @Schema(implementation = Null.class))),
         @ApiResponse(responseCode = "400", description = "오류로 인해 이벤트의 정보를 반환하지 못함", content = {
-            @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))
+            @Content(schema = @Schema(implementation = Null.class))
         })
     })
     @GetMapping("/nearby")
@@ -107,7 +107,7 @@ public class EventController {
             @Content(schema = @Schema(implementation = EventDto.class))
         }),
         @ApiResponse(responseCode = "400", description = "오류로 인해 이벤트를 수정하지 못함", content = {
-            @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))
+            @Content(schema = @Schema(implementation = Null.class))
         })
     })
     @PutMapping("/{eventId}")
@@ -122,7 +122,7 @@ public class EventController {
             @Content(schema = @Schema(implementation = EventDto.class))
         }),
         @ApiResponse(responseCode = "400", description = "오류로 인해 이벤트를 삭제하지 못함", content = {
-            @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))
+            @Content(schema = @Schema(implementation = Null.class))
         })
     })
     @DeleteMapping("/{eventId}")
@@ -135,8 +135,8 @@ public class EventController {
     @Operation(summary = "특정 축제의 앰배서더 목록 조회", description = "해당 행사/축제의 앰배서더 목록 조회")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "행사/축제의 앰배서더 목록을 성공적으로 조회한 경우", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AmbassadorEntity.class)))),
-        @ApiResponse(responseCode = "400", description = "오류가 발생해 행사/축제의 앰배서더 목록을 조회하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
-        @ApiResponse(responseCode = "404", description = "존재하지 않는 행사/축제인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
+        @ApiResponse(responseCode = "400", description = "오류가 발생해 행사/축제의 앰배서더 목록을 조회하지 못한 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 행사/축제인 경우", content = @Content(schema = @Schema(implementation = Null.class)))
     })
     public ResponseEntity<List<AmbassadorDto>> getAmbassadorList(@Parameter(description = "앰버서더를 조회할 행사의 ID입니다.", example = "12345678") @RequestParam(defaultValue = "12345678") String eventId) {
 //        List<AmbassadorDto> ambassadors = ambassadorService.listAmbassadorsByEvent(eventId);

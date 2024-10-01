@@ -1,6 +1,5 @@
 package com.example.yeogiwa.domain.event.dto.response;
 
-import com.example.yeogiwa.domain.event.EventEntity;
 import com.example.yeogiwa.domain.event.dto.EventEtc;
 import com.example.yeogiwa.openapi.festival.dto.FestivalCommonDto;
 import com.example.yeogiwa.openapi.festival.dto.FestivalIntroDto;
@@ -8,8 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Optional;
 
 @Data
 @NoArgsConstructor

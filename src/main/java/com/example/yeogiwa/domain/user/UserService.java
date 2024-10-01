@@ -3,7 +3,6 @@ package com.example.yeogiwa.domain.user;
 import com.example.yeogiwa.util.JwtUtil;
 import com.example.yeogiwa.domain.user.dto.LoginDto;
 import com.example.yeogiwa.domain.user.dto.LoginResponseDto;
-import com.example.yeogiwa.domain.user.dto.RegisterDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
@@ -58,23 +57,6 @@ public class UserService {
         loginResponseDto.setAccessToken(accessToken);
         loginResponseDto.setRefreshToken(refreshToken);
         return loginResponseDto;
-    }
-
-    public Long createUser(RegisterDTO registerDTO) throws HttpClientErrorException {
-        String email = registerDTO.getEmail();
-        String password = registerDTO.getPassword();
-
-        // Check if already exists
-        Boolean isExist = userRepository.existsByEmail(email);
-
-        if (isExist) throw new HttpClientErrorException(HttpStatusCode.valueOf(409));
-        //
-        UserEntity user = UserEntity.builder()
-                .email(email)
-                .password(bCryptPasswordEncoder.encode(password))
-                .build();
-
-        return userRepository.save(user).getId();
     }
 
     public void deleteUser(Long userId) {

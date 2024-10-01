@@ -5,9 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-public interface AmbassadorRepository extends JpaRepository<AmbassadorEntity, UUID> {
+public interface AmbassadorRepository extends JpaRepository<AmbassadorEntity, Long> {
     List<AmbassadorEntity> findAllByUser(UserEntity user);
 
     List<AmbassadorEntity> findAllByEvent_Id(Long eventId);

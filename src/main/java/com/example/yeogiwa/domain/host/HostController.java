@@ -52,9 +52,9 @@ public class HostController {
     @Operation(summary = "호스트의 행사 목록 조회", description = "호스트가 등록한 행사/축제 목록 조회")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "호스트가 등록한 행사/축제 목록을 성공적으로 조회한 경우", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EventDto.class)))),
-        @ApiResponse(responseCode = "400", description = "오류가 발생해 호스트가 등록한 행사/축제 목록을 조회하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
-        @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
-        @ApiResponse(responseCode = "404", description = "존재하지 않는 호스트인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
+        @ApiResponse(responseCode = "400", description = "오류가 발생해 호스트가 등록한 행사/축제 목록을 조회하지 못한 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 호스트인 경우", content = @Content(schema = @Schema(implementation = Null.class)))
     })
     public ResponseEntity<List<EventDto>> getHostEvents(Authentication authentication) {
         PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
@@ -66,9 +66,9 @@ public class HostController {
     @Operation(summary = "호스트의 행사 목록 조회", description = "호스트가 등록한 행사/축제 목록 조회")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "호스트가 등록한 행사/축제 목록을 성공적으로 조회한 경우", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EventDto.class)))),
-        @ApiResponse(responseCode = "400", description = "오류가 발생해 호스트가 등록한 행사/축제 목록을 조회하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
-        @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
-        @ApiResponse(responseCode = "404", description = "존재하지 않는 호스트인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
+        @ApiResponse(responseCode = "400", description = "오류가 발생해 호스트가 등록한 행사/축제 목록을 조회하지 못한 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 호스트인 경우", content = @Content(schema = @Schema(implementation = Null.class)))
     })
     public ResponseEntity<List<EventDto>> getHostEventsGroups(Authentication authentication) {
         PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
@@ -80,9 +80,9 @@ public class HostController {
     @Operation(summary = "호스트의 행사의 회차 목록 조회", description = "해당 호스트의 행사/축제 회차 목록 조회")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "호스트의 행사/축제 회차 목록을 성공적으로 조회한 경우", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EventDto.class)))),
-        @ApiResponse(responseCode = "400", description = "오류가 발생해 호스트의 행사/축제 회차 목록을 조회하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
-        @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
-        @ApiResponse(responseCode = "404", description = "호스트나 행사가 존재하지 않는 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
+        @ApiResponse(responseCode = "400", description = "오류가 발생해 호스트의 행사/축제 회차 목록을 조회하지 못한 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "404", description = "호스트나 행사가 존재하지 않는 경우", content = @Content(schema = @Schema(implementation = Null.class)))
     })
     public ResponseEntity<List<EventDto>> getHostEventRounds(Authentication authentication, @PathVariable Long eventId) {
         PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
@@ -95,9 +95,9 @@ public class HostController {
     @Operation(summary = "호스트의 행사 생성", description = "호스트의 행사/축제 등록")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "호스트가 행사/축제 목록을 성공적으로 등록한 경우", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EventDto.class)))),
-        @ApiResponse(responseCode = "400", description = "오류가 발생해 호스트가 등록한 행사/축제 목록을 등록하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
-        @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
-        @ApiResponse(responseCode = "404", description = "호스트가 존재하지 않는 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
+        @ApiResponse(responseCode = "400", description = "오류가 발생해 호스트가 등록한 행사/축제 목록을 등록하지 못한 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "404", description = "호스트가 존재하지 않는 경우", content = @Content(schema = @Schema(implementation = Null.class)))
     })
     public ResponseEntity<Long> createHostEvent(Authentication authentication, @RequestBody CreateHostEventDto eventsDto) {
         PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
@@ -118,9 +118,9 @@ public class HostController {
     @Operation(summary = "호스트의 행사 여러개 생성", description = "호스트의 행사/축제 여러개 등록")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "호스트가 행사/축제 목록을 성공적으로 등록한 경우", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EventDto.class)))),
-        @ApiResponse(responseCode = "400", description = "오류가 발생해 호스트가 등록한 행사/축제 목록을 등록하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
-        @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
-        @ApiResponse(responseCode = "404", description = "호스트가 존재하지 않는 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
+        @ApiResponse(responseCode = "400", description = "오류가 발생해 호스트가 등록한 행사/축제 목록을 등록하지 못한 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "404", description = "호스트가 존재하지 않는 경우", content = @Content(schema = @Schema(implementation = Null.class)))
     })
     public ResponseEntity<List<Long>> createHostEvents(Authentication authentication, @RequestBody List<CreateHostEventDto> eventsDtos) {
         PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
@@ -141,9 +141,9 @@ public class HostController {
     @Operation(summary = "호스트의 행사 내 회차 생성", description = "호스트의 행사/축제 회차 여러개 등록")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "호스트가 행사/축제 회차를 성공적으로 등록한 경우", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EventDto.class)))),
-        @ApiResponse(responseCode = "400", description = "오류가 발생해 호스트가 등록한 행사/축제 회차를 등록하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
-        @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
-        @ApiResponse(responseCode = "404", description = "호스트나 행사가 존재하지 않는 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
+        @ApiResponse(responseCode = "400", description = "오류가 발생해 호스트가 등록한 행사/축제 회차를 등록하지 못한 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "404", description = "호스트나 행사가 존재하지 않는 경우", content = @Content(schema = @Schema(implementation = Null.class)))
     })
     public ResponseEntity<Long> createHostRound(Authentication authentication, @PathVariable Long eventId, @RequestBody CreateHostRoundDto eventDto) {
         PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
@@ -165,9 +165,9 @@ public class HostController {
     @Operation(summary = "호스트의 행사 내 회차 여러개 생성", description = "호스트의 행사/축제 회차 여러개 등록")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "호스트가 행사/축제 회차를 성공적으로 등록한 경우", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EventDto.class)))),
-        @ApiResponse(responseCode = "400", description = "오류가 발생해 호스트가 등록한 행사/축제 회차를 등록하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
-        @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
-        @ApiResponse(responseCode = "404", description = "호스트나 행사가 존재하지 않는 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
+        @ApiResponse(responseCode = "400", description = "오류가 발생해 호스트가 등록한 행사/축제 회차를 등록하지 못한 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "404", description = "호스트나 행사가 존재하지 않는 경우", content = @Content(schema = @Schema(implementation = Null.class)))
     })
     public ResponseEntity<List<Long>> createHostRounds(Authentication authentication, @PathVariable Long eventId, @RequestBody List<CreateHostRoundDto> eventDtos) {
         PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();

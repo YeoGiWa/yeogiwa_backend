@@ -1,11 +1,8 @@
 package com.example.yeogiwa.domain.ambassador;
 
 import com.example.yeogiwa.domain.ambassador.dto.AmbassadorDto;
-import com.example.yeogiwa.domain.ambassador.dto.CreateAmbassadorRequest;
 import com.example.yeogiwa.domain.event.EventEntity;
 import com.example.yeogiwa.domain.event.EventRepository;
-import com.example.yeogiwa.domain.user.UserEntity;
-import com.example.yeogiwa.domain.user.UserRepository;
 import com.example.yeogiwa.util.QRUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
@@ -14,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +32,7 @@ public class AmbassadorService {
     }
 
 
-    public AmbassadorDto getAmbassadorById(UUID id) {
+    public AmbassadorDto getAmbassadorById(Long id) {
         AmbassadorEntity ambassador = ambassadorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ambassador not found"));
 

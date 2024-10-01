@@ -2,7 +2,6 @@ package com.example.yeogiwa.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.AeadAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
 import jakarta.servlet.http.Cookie;
@@ -14,12 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.security.Key;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collection;
 import java.util.Date;
 
 @Component
@@ -161,9 +155,5 @@ public class JwtUtil {
 
     public Long getId(String token) {
         return parseClaims(token).get("id", Long.class);
-    }
-
-    public String getClientId() {
-        return clientId;
     }
 }

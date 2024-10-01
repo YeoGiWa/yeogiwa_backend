@@ -5,7 +5,6 @@ import com.example.yeogiwa.domain.event.EventRepository;
 import com.example.yeogiwa.domain.event.dto.EventEtc;
 import com.example.yeogiwa.domain.event.dto.response.EventDetailResponse;
 import com.example.yeogiwa.domain.event.dto.response.EventsResponse;
-import com.example.yeogiwa.domain.favorite.FavoriteRepository;
 import com.example.yeogiwa.enums.Region;
 import com.example.yeogiwa.enums.EventSort;
 import com.example.yeogiwa.openapi.business.BusinessApiClient;
@@ -37,7 +36,6 @@ public class OpenApiService {
     private final FestivalApiClient festivalApiClient;
     private final BusinessApiClient businessApiClient;
     private final EventRepository eventRepository;
-    private final FavoriteRepository favoriteRepository;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     @Value("${openapi.festival-secret-key}") private String festivalServiceKey;

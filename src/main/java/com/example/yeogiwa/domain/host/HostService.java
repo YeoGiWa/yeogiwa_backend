@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +37,9 @@ public class HostService {
 
         if (!isValidBusiness) throw new HttpClientErrorException(HttpStatusCode.valueOf(400));
 
-        UserEntity user = userRepository.findById(userId).get();
+        Optional<UserEntity> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) throw new HttpClientErrorException(HttpStatusCode.valueOf(404));
+        UserEntity user = userOpt.get();
         HostEntity host = HostEntity.builder()
             .user(user)
             .name(body.getName())
@@ -61,7 +64,7 @@ public class HostService {
     public List<EventDto> getHostEvents(Long userId) {
         HostEntity host = hostRepository.findByUser_Id(userId);
         return eventRepository.findAllByHost_Id(host.getId()).stream().map(
-            event -> EventDto.from(event)
+            EventDto::from
         ).toList();
     }
 
@@ -69,7 +72,7 @@ public class HostService {
         HostEntity host = hostRepository.findByUser_Id(userId);
         if (host == null) throw new HttpClientErrorException(HttpStatusCode.valueOf(404));
         return eventRepository.findAllByHost_IdAndUpperEvent_Id(host.getId(), upperEventId).stream().map(
-            event -> EventDto.from(event)
+            EventDto::from
         ).toList();
     }
 
