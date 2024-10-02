@@ -2,13 +2,10 @@ package com.example.yeogiwa.domain.event;
 
 import com.example.yeogiwa.auth.oauth.PrincipalDetails;
 import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
-import com.example.yeogiwa.domain.ambassador.AmbassadorService;
 import com.example.yeogiwa.domain.ambassador.dto.AmbassadorDto;
 import com.example.yeogiwa.domain.event.dto.EventDto;
-import com.example.yeogiwa.domain.event.dto.request.UpdateEventDto;
 import com.example.yeogiwa.domain.event.dto.response.EventDetailResponse;
 import com.example.yeogiwa.domain.event.dto.response.EventsResponse;
-import com.example.yeogiwa.domain.favorite.FavoriteService;
 import com.example.yeogiwa.enums.Region;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,7 +22,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/event")
@@ -33,8 +29,6 @@ import java.util.UUID;
 @Tag(name = "🎆 이벤트 API", description = "이벤트 관련 API")
 public class EventController {
     private final EventService eventService;
-    private final AmbassadorService ambassadorService;
-    private final FavoriteService favoriteService;
 
     @Operation(summary = "특정 이벤트 정보 조회", description = "특정 이벤트의 상세 정보를 반환")
     @ApiResponses(value = {
@@ -102,20 +96,32 @@ public class EventController {
         return ResponseEntity.status(200).body(results);
     }
 
-
-    @Operation(summary = "행사 정보 수정", description = "행사의 정보를 수정")
+    @Operation(summary = "행사 활성화", description = "앰배서더가 신청할 수 있도록 행사를 활성화 상태로 변경합니다.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "행사를 정상적으로 수정", content = {
-            @Content(schema = @Schema(implementation = EventDto.class))
-        }),
-        @ApiResponse(responseCode = "400", description = "오류로 인해 행사를 수정하지 못함", content = {
-            @Content(schema = @Schema(implementation = Null.class))
-        })
+        @ApiResponse(responseCode = "200", description = "행사를 정상적으로 활성화", content = @Content(schema = @Schema(implementation = EventDto.class))),
+        @ApiResponse(responseCode = "400", description = "오류가 발생해 행사를 활성화하지 못함", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "403", description = "호스트 본인의 행사가 아닌 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "404", description = "해당 ID를 갖는 행사가 없음", content = @Content(schema = @Schema(implementation = Null.class)))
     })
-    @PutMapping("/{eventId}")
-    public ResponseEntity<EventDto> updateEvent(@PathVariable String id, @RequestBody UpdateEventDto request) {
+    @PatchMapping("/{eventId}/applicable")
+    public ResponseEntity<EventDto> makeEventApplicable(Authentication authentication, @PathVariable Long eventId) {
+        PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
+        EventEntity event = eventService.changeApplicable(user.getUserId(), eventId, true);
+        return ResponseEntity.status(200).body(EventDto.from(event));
+    }
 
-        return null;
+    @Operation(summary = "행사 비활성화", description = "앰배서더가 신청할 수 없도록 행사를 비활성화 상태로 변경합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "행사를 정상적으로 비활성화", content = @Content(schema = @Schema(implementation = EventDto.class))),
+        @ApiResponse(responseCode = "400", description = "오류가 발생해 행사를 비활성화하지 못함", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "403", description = "호스트 본인의 행사가 아닌 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "404", description = "해당 ID를 갖는 행사가 없음", content = @Content(schema = @Schema(implementation = Null.class)))
+    })
+    @PatchMapping("/{eventId}/unapplicable")
+    public ResponseEntity<EventDto> makeEventUnapplicable(Authentication authentication, @PathVariable Long eventId) {
+        PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
+        EventEntity event = eventService.changeApplicable(user.getUserId(), eventId, false);
+        return ResponseEntity.status(200).body(EventDto.from(event));
     }
 
     @Operation(summary = "행사 삭제", description = "행사의 등록 정보를 삭제")

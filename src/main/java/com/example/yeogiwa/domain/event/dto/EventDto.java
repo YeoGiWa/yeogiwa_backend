@@ -20,6 +20,7 @@ public class EventDto {
     private Integer round;
     private Integer ratio;
     private LocalDateTime createdAt;
+    private Boolean isApplicable;
     private Boolean isDeleted;
 
     public static EventDto from(EventEntity event) {
@@ -31,6 +32,7 @@ public class EventDto {
             .round(event.getRound())
             .ratio(event.getRatio())
             .createdAt(event.getCreatedAt())
+            .isApplicable(event.getIsApplicable())
             .isDeleted(event.getIsDeleted())
             .build();
     }

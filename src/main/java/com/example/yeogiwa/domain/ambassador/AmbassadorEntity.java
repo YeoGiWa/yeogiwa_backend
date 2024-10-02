@@ -49,8 +49,7 @@ public class AmbassadorEntity {
     private Long eventId;
 
     /* Columns */
-    @NonNull
-    @Column(nullable = false)
+    @Column(columnDefinition = "MEDIUMBLOB")
     private byte[] qr;
 
     @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
