@@ -138,6 +138,26 @@ public class EventController {
         return null;
     }
 
+    @Operation(summary = "즐겨찾기한 행사 목록 조회", description = "해당 유저가 즐겨찾기한 행사의 목록을 조회")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "행사 목록을 정상적으로 조회", content = {
+            @Content(schema = @Schema(implementation = EventDto.class))
+        }),
+        @ApiResponse(responseCode = "400", description = "오류로 인해 행사를 조회하지 못함", content = {
+            @Content(schema = @Schema(implementation = Null.class))
+        })
+    })
+    @GetMapping("/favorites")
+    public ResponseEntity<List<EventsResponse>> getFavoriteEventList(
+        Authentication authentication,
+        @Parameter(description = "페이지에 보여줄 결과의 갯수 입니다. 기본 값은 10입니다.", example = "10") @RequestParam(defaultValue = "10") Integer numOfRows,
+        @Parameter(description = "페이지 번호입니다. 0부터 시작합니다.", example = "0") @RequestParam Integer pageNo
+     ) {
+        PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
+        List<EventsResponse> favoriteEvents = eventService.getFavoriteEvents(user.getUserId(), numOfRows, pageNo);
+        return ResponseEntity.status(200).body(favoriteEvents);
+    }
+
     @GetMapping("/ambassadors")
     @Operation(summary = "특정 축제의 앰배서더 목록 조회", description = "해당 행사/축제의 앰배서더 목록 조회")
     @ApiResponses(value = {

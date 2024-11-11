@@ -58,4 +58,17 @@ public class EventsResponse {
             .isApplicable(eventEtc.get(festival.getContentid())!=null ? eventEtc.get(festival.getContentid()).getIsApplicable() : false)
             .build();
     }
+
+    public static EventsResponse from(EventDetailResponse eventDetail) {
+        return EventsResponse.builder()
+            .eventId(eventDetail.getEventId())
+            .thumbnailImage(eventDetail.getFirstImageThumbnail())
+            .title(eventDetail.getTitle())
+            .address(eventDetail.getAddress())
+            .eventStartDate(eventDetail.getEventStartDate())
+            .eventEndDate(eventDetail.getEventEndDate())
+            .round(eventDetail.getRound())
+            .isApplicable(eventDetail.getIsApplicable())
+            .build();
+    }
 }

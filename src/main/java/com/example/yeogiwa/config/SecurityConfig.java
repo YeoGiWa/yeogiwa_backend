@@ -34,7 +34,10 @@ public class SecurityConfig {
     };
 
     public static String[] AllowedGetMethodURLsToPublic = {
-        "/event/**"
+        "/event/{eventId}",
+        "/event/nearby",
+        "/event/list",
+//        "/event/**"
     };
 
     public static String[] AllowedURLsToAdmin = {

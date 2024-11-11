@@ -2,10 +2,16 @@ package com.example.yeogiwa.domain.event;
 
 import com.example.yeogiwa.domain.event.dto.response.EventDetailResponse;
 import com.example.yeogiwa.domain.event.dto.response.EventsResponse;
-import com.example.yeogiwa.domain.user.UserRepository;
+import com.example.yeogiwa.domain.favorite.FavoriteEntity;
+import com.example.yeogiwa.domain.favorite.FavoriteRepository;
 import com.example.yeogiwa.enums.Region;
 import com.example.yeogiwa.openapi.OpenApiService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +24,11 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class EventService {
     private final OpenApiService openApiService;
     private final EventRepository eventRepository;
+    private final FavoriteRepository favoriteRepository;
 
     public EventDetailResponse getEventDetailById(Long eventId) {
         return openApiService.getFestival(eventId);
@@ -34,6 +42,20 @@ public class EventService {
         return openApiService.getNearbyFestivals(numofRows, pageNo, mapX, mapY, radius);
     }
 
+    public List<EventsResponse> getFavoriteEvents(Long userId, Integer numofRows, Integer pageNo) {
+        if (pageNo<0) throw new HttpClientErrorException(HttpStatusCode.valueOf(400));
+
+        Pageable pageable = PageRequest.of(pageNo, numofRows, Sort.by("createdAt").descending());
+        Page<FavoriteEntity> favorites = favoriteRepository.findAllByUser_Id(userId, pageable);
+        log.info("{} {}", userId, favorites.getContent());
+//        log.info("{}", favorites.getContent().size());
+        return favorites.map((favorite) -> {
+            EventDetailResponse festival = openApiService.getFestival(favorite.getEventId());
+            log.info("{}", favorite);
+            return EventsResponse.from(festival);
+        }).toList();
+    }
+
     public EventEntity changeApplicable(Long userId, Long eventId, Boolean applicable) {
         Optional<EventEntity> eventOpt = eventRepository.findById(eventId);
         if (eventOpt.isEmpty()) throw new HttpClientErrorException(HttpStatusCode.valueOf(404));
@@ -43,4 +65,5 @@ public class EventService {
         event.setIsApplicable(applicable);
         return eventRepository.save(event);
     }
+
 }
