@@ -3,17 +3,11 @@ package com.example.yeogiwa.domain.event;
 import com.example.yeogiwa.domain.ambassador.AmbassadorEntity;
 import com.example.yeogiwa.domain.host.HostEntity;
 import com.example.yeogiwa.domain.promoted.PromotedEntity;
-import com.example.yeogiwa.domain.session.SessionEntity;
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.*;
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,18 +30,34 @@ public class EventEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "host_id")
+    @JoinColumn(name = "host_id", insertable = false, updatable = false)
     private HostEntity host;
 
+    @Column(name = "host_id")
+    private Long hostId;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "upper_event_id", insertable = false, updatable = false)
+    private EventEntity upperEvent;
+
+
+    @Column(name = "upper_event_id")
+    private Long upperEventId;
+
     /* Columns */
-    @Column(nullable = false)
-    private String name;
+    @Column
+    private String title;
+
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 1")
+    @Builder.Default
+    private Integer round = 1; // 회차
 
     @Column(nullable = false)
-    private String place;
+    private Integer ratio;
 
     @Column(nullable = false)
-    private int ratio;
+    @Builder.Default
+    private Boolean isApplicable = false;
 
     @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
@@ -55,16 +65,6 @@ public class EventEntity {
     @Column(nullable = false, insertable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     @Builder.Default
     private Boolean isDeleted = false;
-
-    private LocalDate startAt;
-
-    private LocalDate endAt;
-
-    private String imageUrl;
-
-    private String region;
-
-    private Integer totalFund;
 
     /* Related */
     @OneToMany(mappedBy = "event")
@@ -75,7 +75,7 @@ public class EventEntity {
     @Builder.Default
     private List<PromotedEntity> promotes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(mappedBy = "id")
     @Builder.Default
-    private List<SessionEntity> sessions = new ArrayList<>();
+    private List<EventEntity> lowerEvents = new ArrayList<>();
 }

@@ -1,5 +1,6 @@
 package com.example.yeogiwa.domain.user;
 
+import com.example.yeogiwa.util.JwtUtil;
 import com.example.yeogiwa.auth.oauth.PrincipalDetails;
 import com.example.yeogiwa.domain.user.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,7 +20,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Base64;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/user")
@@ -29,20 +29,21 @@ import java.util.UUID;
 @Slf4j
 public class UserController {
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @GetMapping("/")
     @Operation(summary = "유저 정보 조회", description = "유저의 상세 정보를 반환")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "유저의 상세 정보를 정상적으로 반환한 경우"),
-            @ApiResponse(responseCode = "400", description = "에러가 발생해 유저의 상세 정보를 반환하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
-            @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
-            @ApiResponse(responseCode = "404", description = "이미 탈퇴한 유저인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
+            @ApiResponse(responseCode = "400", description = "에러가 발생해 유저의 상세 정보를 반환하지 못한 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+            @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+            @ApiResponse(responseCode = "404", description = "이미 탈퇴한 유저인 경우", content = @Content(schema = @Schema(implementation = Null.class)))
     })
     public ResponseEntity<UserDto> getUser(Authentication authentication) {
         PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
         Optional<UserEntity> opUser = userService.getUser(user.getUserId());
-        UserDto userDto = UserDto.from(opUser);
-        log.info("optional User: {}", userDto);
+        if (opUser.isEmpty()) throw new HttpClientErrorException(HttpStatusCode.valueOf(404));
+        UserDto userDto = UserDto.from(opUser.get());
         return ResponseEntity.status(200).body(userDto);
     }
 
@@ -51,7 +52,8 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(schema = @Schema(implementation = Long.class))),
         @ApiResponse(responseCode = "201", description = "로그인 및 회원가입 성공", content = @Content(schema = @Schema(implementation = Long.class))),
-        @ApiResponse(responseCode = "401", description = "잘못된 registration access 토큰", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class)))
+        @ApiResponse(responseCode = "400", description = "유저 식별 정보가 없이 요청을 보낸 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "401", description = "잘못된 registration access 토큰", content = @Content(schema = @Schema(implementation = Null.class)))
     })
     public ResponseEntity<Long> login(@RequestBody LoginDto loginDto) {
 
@@ -76,6 +78,24 @@ public class UserController {
                 break;
             }
             case "apple": {
+//                RestTemplate request = new RestTemplate();
+//                String url = "https://appleid.apple.com/auth/oauth2/v2/token";
+//                HttpHeaders requestHeader = new HttpHeaders();
+//                requestHeader.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//                String appleClientSecret = jwtUtil.createAppleClientSecret();
+//                AppleRequestBodyDto requestBody = new AppleRequestBodyDto(jwtUtil.getClientId(), appleClientSecret, loginDto.getToken());
+//                log.info("apple token: {}", requestBody.getRefresh_token());
+//                try {
+//                    ResponseEntity<AppleDto> appleDto = request.exchange(
+//                        url,
+//                        HttpMethod.POST,
+//                        new HttpEntity<>(requestBody, requestHeader),
+//                        AppleDto.class
+//                    );
+//                } catch (HttpClientErrorException e) {
+//                    // if token is not valid, return 401
+//                    return ResponseEntity.status(401).body(null);
+//                }
                 break;
             }
             default: return ResponseEntity.status(401).body(null);
@@ -90,6 +110,7 @@ public class UserController {
             "refresh",
                 Base64.getEncoder().encodeToString(result.getRefreshToken().getBytes())
             )
+            .path("/")
             .httpOnly(true)
             .secure(true)
             .maxAge(14 * 24 * 60 * 60 * 1000L) // 2 weeks
@@ -104,9 +125,9 @@ public class UserController {
     @Operation(summary = "유저 탈퇴", description = "해당 유저의 isDeleted를 true로 설정(실제로 삭제하지 않음)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "유저가 성공적으로 탈퇴한 경우"),
-            @ApiResponse(responseCode = "400", description = "존재하지 않는 유저거나 에러가 발생해 유저가 탈퇴하지 못한 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.BadRequest.class))),
-            @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
-            @ApiResponse(responseCode = "404", description = "이미 탈퇴한 유저인 경우", content = @Content(schema = @Schema(implementation = HttpClientErrorException.NotFound.class)))
+            @ApiResponse(responseCode = "400", description = "존재하지 않는 유저거나 에러가 발생해 유저가 탈퇴하지 못한 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+            @ApiResponse(responseCode = "401", description = "로그인 하지 않은 유저의 요청인 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+            @ApiResponse(responseCode = "404", description = "이미 탈퇴한 유저인 경우", content = @Content(schema = @Schema(implementation = Null.class)))
     })
     public ResponseEntity<Null> deleteUser(Authentication authentication) {
         PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();

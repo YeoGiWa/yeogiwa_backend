@@ -1,9 +1,8 @@
 package com.example.yeogiwa.domain.user;
 
-import com.example.yeogiwa.auth.jwt.JwtUtil;
+import com.example.yeogiwa.util.JwtUtil;
 import com.example.yeogiwa.domain.user.dto.LoginDto;
 import com.example.yeogiwa.domain.user.dto.LoginResponseDto;
-import com.example.yeogiwa.domain.user.dto.RegisterDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
@@ -13,7 +12,6 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.security.SecureRandom;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -28,6 +26,9 @@ public class UserService {
     }
 
     public LoginResponseDto login(LoginDto loginDto) {
+        if (loginDto.getRegistration() == null || loginDto.getRegistrationId() == null) {
+            throw new HttpClientErrorException(HttpStatusCode.valueOf(400));
+        }
         LoginResponseDto loginResponseDto = new LoginResponseDto();
         loginResponseDto.setStatus(200);
 
@@ -49,40 +50,13 @@ public class UserService {
         );
 
         /* Issue tokens */
-        String accessToken = jwtUtil.createToken(
-            "access",
-            user.getId(),
-            user.getRole().name(),
-            1 * 60 * 60 * 1000L // 1 hour
-        );
-        String refreshToken = jwtUtil.createToken(
-            "refresh",
-            user.getId(),
-            user.getRole().name(),
-            14 * 24 * 60 * 60 * 1000L // 2 weeks
-        );
+        String accessToken = jwtUtil.createAccessToken(user.getId(), user.getRole().name());
+        String refreshToken = jwtUtil.createRefreshToken(user.getId(), user.getRole().name());
 
         loginResponseDto.setUserId(user.getId());
         loginResponseDto.setAccessToken(accessToken);
         loginResponseDto.setRefreshToken(refreshToken);
         return loginResponseDto;
-    }
-
-    public Long createUser(RegisterDTO registerDTO) throws HttpClientErrorException {
-        String email = registerDTO.getEmail();
-        String password = registerDTO.getPassword();
-
-        // Check if already exists
-        Boolean isExist = userRepository.existsByEmail(email);
-
-        if (isExist) throw new HttpClientErrorException(HttpStatusCode.valueOf(409));
-        //
-        UserEntity user = UserEntity.builder()
-                .email(email)
-                .password(bCryptPasswordEncoder.encode(password))
-                .build();
-
-        return userRepository.save(user).getId();
     }
 
     public void deleteUser(Long userId) {

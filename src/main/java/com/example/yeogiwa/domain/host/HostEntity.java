@@ -13,7 +13,6 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -33,10 +32,28 @@ public class HostEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", unique = true)
     private UserEntity user;
 
     /* Columns */
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private String delegateName;
+
+    @Column
+    private String chargerName;
+
+    @Column
+    private String chargerEmail;
+
+    @Column
+    private String chargerPhoneNumber;
+
+    @Column(nullable = false, unique = true)
+    private String businessNumber;
+
     @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 

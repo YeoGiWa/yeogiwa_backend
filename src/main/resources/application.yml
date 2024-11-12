@@ -1,6 +1,7 @@
 spring:
   application:
-  name: yeogiwa
+    name: yeogiwa
+    base-url: ${BASE_URL}
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -16,6 +17,11 @@ spring:
         # show_sql: true
         format_sql: true
     open-in-view: false
+  sql:
+    init:
+      data-locations: classpath*:data.sql
+      mode: always
+      platform:
 
   jwt:
     secret: ${JWT_SECRET}
@@ -35,6 +41,18 @@ spring:
             authorization-grant-type: authorization_code
             client-name: kakao
             client-authentication-method: client_secret_post
+          apple:
+            client-id: ${APPLE_CLIENT_ID}
+            key-id: ${APPLE_KEY_ID}
+            team-id: ${APPLE_TEAM_ID}
+            private-key: ${APPLE_PRIVATE_KEY}
+            scope:
+              - name
+              - email
+            redirect-uri: ${BASE_URL}/login/oauth2/code/apple
+            authorization-grant-type: authorization_code
+            client-name: apple
+            client-authentication-method: POST
 
         provider:
           kakao:
@@ -42,9 +60,13 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+          apple:
+            authorization-uri: https://appleid.apple.com/auth/oauth2/v2/authorize
+            token-uri: https://appleid.apple.com/auth/oauth2/v2/token
 
 openapi:
-  secret-key: ${OPENAPI_KEY}
+  festival-secret-key: ${OPENAPI_FESTIVAL_KEY}
+  business-secret-key: ${OPENAPI_BUSINESS_KEY}
 
 springdoc:
   swagger-ui:

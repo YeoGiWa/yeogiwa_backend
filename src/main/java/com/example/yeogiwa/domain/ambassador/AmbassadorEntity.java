@@ -1,8 +1,8 @@
 package com.example.yeogiwa.domain.ambassador;
 
+import com.example.yeogiwa.domain.event.EventEntity;
 import com.example.yeogiwa.domain.promoted.PromotedEntity;
 import com.example.yeogiwa.domain.user.UserEntity;
-import com.example.yeogiwa.domain.event.EventEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -13,12 +13,9 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.lang.NonNull;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Builder
@@ -33,22 +30,27 @@ public class AmbassadorEntity {
 
     /* Keys */
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ambassador_id")
-    private UUID id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private UserEntity user;
 
+    @Column(name = "user_id")
+    private Long userId;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_id")
+    @JoinColumn(name = "event_id", insertable = false, updatable = false)
     private EventEntity event;
 
+    @Column(name = "event_id")
+    private Long eventId;
+
     /* Columns */
-    @NonNull
-    @Column(nullable = false)
-    private String qr;
+    @Column(columnDefinition = "MEDIUMBLOB")
+    private byte[] qr;
 
     @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;

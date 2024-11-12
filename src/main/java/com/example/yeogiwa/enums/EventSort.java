@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum EventSort {
     TITLE("A"),
-    MODIFYING("C"),
-    CREATING("D");
+    MODIFIED_AT("C"),
+    CREATE_AT("D");
 
     public final String type;
 }

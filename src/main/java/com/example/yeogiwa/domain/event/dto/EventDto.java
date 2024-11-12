@@ -6,10 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -17,51 +14,26 @@ import java.util.List;
 @Builder
 public class EventDto {
     private Long id;
-
-    private String name;
-
-    private String place;
-
-    private int ratio;
-
-    private LocalDate startAt;
-
-    private LocalDate endAt;
-
-    private String imageUrl;
-
-    private String region;
-
-    private Integer totalFund;
-
+    private Long host;
+    private Long upperEventId;
+    private String title;
+    private Integer round;
+    private Integer ratio;
     private LocalDateTime createdAt;
-
-    private List<SessionDto> sessions;
-
-//    private List<AmbassadorEntity> ambassadors = new ArrayList<>();
-//
-//    private List<PromotedEntity> promotes = new ArrayList<>();
-//
-//    private List<FundEntity> funds = new ArrayList<>();
-
+    private Boolean isApplicable;
+    private Boolean isDeleted;
 
     public static EventDto from(EventEntity event) {
-        List<SessionDto> sessions = event.getSessions().stream()
-            .map(SessionDto::from)
-            .toList();
-
         return EventDto.builder()
             .id(event.getId())
-            .name(event.getName())
-            .place(event.getPlace())
+            .host(event.getHostId())
+            .upperEventId(event.getUpperEventId())
+            .title(event.getTitle())
+            .round(event.getRound())
             .ratio(event.getRatio())
-            .startAt(event.getStartAt())
-            .endAt(event.getEndAt())
-            .imageUrl(event.getImageUrl())
-            .region(event.getRegion())
-            .totalFund(event.getTotalFund())
             .createdAt(event.getCreatedAt())
-            .sessions(sessions)
+            .isApplicable(event.getIsApplicable())
+            .isDeleted(event.getIsDeleted())
             .build();
     }
 }

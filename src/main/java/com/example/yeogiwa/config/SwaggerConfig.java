@@ -19,10 +19,15 @@ import org.springframework.context.annotation.Configuration;
     ),
     security = {
         @SecurityRequirement(name = "Authorization"),
+        @SecurityRequirement(name = "refresh"),
         @SecurityRequirement(name = "Kakao", scopes = {
             "profile_nickname",
             "profile_image",
             "account_email"
+        }),
+        @SecurityRequirement(name = "Apple", scopes = {
+            "email",
+            "name"
         })
     },
     servers = @Server(
@@ -30,6 +35,18 @@ import org.springframework.context.annotation.Configuration;
     )
 )
 @SecuritySchemes({
+    @SecurityScheme(
+        name = "Authorization",
+        in = SecuritySchemeIn.HEADER,
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT"
+    ),
+    @SecurityScheme(
+        name = "refresh",
+        type = SecuritySchemeType.APIKEY,
+        in = SecuritySchemeIn.COOKIE
+    ),
     @SecurityScheme(
         name = "Kakao",
         type = SecuritySchemeType.OAUTH2,
@@ -45,11 +62,18 @@ import org.springframework.context.annotation.Configuration;
         )
     ),
     @SecurityScheme(
-        name = "Authorization",
-        in = SecuritySchemeIn.HEADER,
-        type = SecuritySchemeType.HTTP,
-        scheme = "bearer",
-        bearerFormat = "JWT"
+        name = "Apple",
+        type = SecuritySchemeType.OAUTH2,
+        flows = @OAuthFlows(
+            authorizationCode = @OAuthFlow(
+                authorizationUrl = "https://appleid.apple.com/auth/oauth2/v2/authorize?response_mode=form_post",
+                tokenUrl = "https://appleid.apple.com/auth/oauth2/v2/token",
+                scopes = {
+                    @OAuthScope(name = "email", description = "[동의항목] 애플 계정 이메일"),
+                    @OAuthScope(name = "name", description = "[동의항목] 애플 계정 이름")
+                }
+            )
+        )
     )
 })
 public class SwaggerConfig {

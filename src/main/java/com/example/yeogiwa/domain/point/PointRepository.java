@@ -1,6 +1,5 @@
 package com.example.yeogiwa.domain.point;
 
-import com.example.yeogiwa.domain.user.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

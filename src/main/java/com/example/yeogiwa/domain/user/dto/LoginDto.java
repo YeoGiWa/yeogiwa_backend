@@ -12,6 +12,6 @@ public class LoginDto {
     private String registrationId;
     private String email;
     private String name;
-    @Schema(description = "기관에서 발급한 token", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "기관에서 발급한 token을 Base64 encoding하여 보냅니다.", requiredMode = Schema.RequiredMode.REQUIRED)
     private String token;
 }

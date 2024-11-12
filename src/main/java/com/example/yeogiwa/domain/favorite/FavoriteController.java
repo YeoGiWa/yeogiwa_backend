@@ -1,20 +1,24 @@
 package com.example.yeogiwa.domain.favorite;
 
 import com.example.yeogiwa.auth.oauth.PrincipalDetails;
-import com.example.yeogiwa.domain.favorite.dto.FavoriteDto;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.Explode;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.enums.ParameterStyle;
+import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/favorite")
@@ -24,51 +28,66 @@ public class FavoriteController {
 
     private final FavoriteService favoriteService;
 
-    @Operation(summary = "즐겨찾기 추가", description = "사용자와 이벤트 정보를 받아 즐겨찾기 추가, 즐겨찾기 ID 반환")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "즐겨찾기 추가 성공", content = @Content(schema = @Schema(implementation = Long.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(schema = @Schema(implementation = String.class))),
-            @ApiResponse(responseCode = "404", description = "사용자 또는 이벤트를 찾을 수 없음", content = @Content(schema = @Schema(implementation = String.class)))
+    @PostMapping("/event/{eventId}")
+    @Operation(summary = "특정 축제의 즐겨찾기 생성", description = "해당 행사/축제의 즐겨찾기 생성")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "행사의 앰배서더를 성공적으로 생성한 경우", content = @Content(schema = @Schema(implementation = UUID.class))),
+        @ApiResponse(responseCode = "400", description = "오류가 발생해 행사의 앰배서더를 생성하지 못한 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "401", description = "로그인하지 않은 사용자인 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "404", description = "해당 ID의 행사가 존재하지 않는 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "409", description = "이미 해당 행사를 즐겨찾기 한 경우", content = @Content(schema = @Schema(implementation = Null.class)))
     })
-    @PostMapping()
-    public Long addFavorite(Authentication authentication, @RequestParam String eventId) {
+    public ResponseEntity<UUID> createFavorite(Authentication authentication, @Schema(example = "2541883") @PathVariable Long eventId) {
         PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
-        FavoriteDto favorite = favoriteService.addFavorite(user.getUserId(), eventId);
-        return favorite.getId();
+        UUID newFavoriteId = favoriteService.addFavorite(user.getUserId(), eventId);
+        return ResponseEntity.status(201).body(newFavoriteId);
     }
 
-    @Operation(summary = "즐겨찾기 삭제", description = "즐겨찾기 ID를 받아 즐겨찾기 삭제")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "즐겨찾기 삭제 성공", content = @Content(schema = @Schema(implementation = String.class))),
-            @ApiResponse(responseCode = "404", description = "즐겨찾기를 찾을 수 없음", content = @Content(schema = @Schema(implementation = String.class)))
+    @DeleteMapping("/event/{eventId}")
+    @Operation(summary = "특정 축제의 즐겨찾기 삭제", description = "해당 행사/축제의 즐겨찾기 제거")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "행사의 앰배서더를 성공적으로 제거한 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "400", description = "오류가 발생해 행사의 앰배서더를 생성하지 못한 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "401", description = "로그인하지 않은 사용자인 경우", content = @Content(schema = @Schema(implementation = Null.class))),
+        @ApiResponse(responseCode = "404", description = "해당 ID의 행사가 존재하지 않는 경우", content = @Content(schema = @Schema(implementation = Null.class))),
     })
-    @DeleteMapping("/{favoriteId}")
-    public void removeFavorite(@PathVariable Long favoriteId) {
-        favoriteService.removeFavorite(favoriteId);
+    public ResponseEntity<Null> removeFavorite(Authentication authentication, @Schema(example = "2541883") @PathVariable Long eventId) {
+        PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
+        favoriteService.removeFavorite(user.getUserId(), eventId);
+        return ResponseEntity.status(200).body(null);
     }
 
-    @Operation(summary = "즐겨찾기 목록 조회", description = "사용자의 즐겨찾기 목록 조회")
+    @Operation(summary = "이벤트의 즐겨찾기 여부 조회", description = "사용자가 해당 이벤트에 즐겨찾기를 했는지 여부 조회")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "즐겨찾기 목록 조회 성공", content = @Content(array = @ArraySchema(schema = @Schema(implementation = FavoriteDto.class)))),
-            @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음", content = @Content(schema = @Schema(implementation = String.class)))
+        @ApiResponse(responseCode = "200", description = "즐겨찾기 여부 목록 조회 성공", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Boolean.class))))
     })
-    @GetMapping("/list")
-    public ResponseEntity<List<FavoriteDto>> getFavoritesByUser(Authentication authentication) {
+    @GetMapping("/event")
+    public ResponseEntity<Boolean> getIsFavorite(Authentication authentication, @Schema(example = "2541883") @RequestParam Long eventId) {
         PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
-        List<FavoriteDto> favoriteList = favoriteService.getFavoritesByUser(user.getUserId());
-        return ResponseEntity.status(200).body(favoriteList);
+        Boolean isFavorite = favoriteService.getIsFavorite(user.getUserId(), eventId);
+        return ResponseEntity.status(200).body(isFavorite);
     }
 
-    @Operation(summary = "즐겨찾기 단일 조회", description = "이벤트 ID를 받아 해당 이벤트의 즐겨찾기 정보를 조회")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "즐겨찾기 단일 조회 성공", content = @Content(schema = @Schema(implementation = FavoriteDto.class))),
-            @ApiResponse(responseCode = "404", description = "즐겨찾기를 찾을 수 없음", content = @Content(schema = @Schema(implementation = String.class)))
+
+    @Operation(summary = "이벤트들의 즐겨찾기 여부 조회", description = "사용자가 해당 이벤트들에 즐겨찾기를 했는지 여부 조회", parameters = {
+            @Parameter(in = ParameterIn.QUERY, name = "eventIds", explode = Explode.FALSE, style = ParameterStyle.SIMPLE)
     })
-    @GetMapping("/event/{eventId}")
-    public ResponseEntity<FavoriteDto> getFavorite(Authentication authentication, @PathVariable String eventId) {
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "즐겨찾기 여부 목록 조회 성공", content = @Content(schemaProperties = {
+                @SchemaProperty(name = "eventId", schema = @Schema(implementation = Boolean.class))
+            }))
+    })
+    @GetMapping(value = "/events")
+    public ResponseEntity<Map<Long, Boolean>> getIsFavorites(
+        Authentication authentication,
+        @Parameter(
+            example ="[2541883, 1234567]",
+            array =  @ArraySchema(schema = @Schema(implementation = Long.class)))
+        @RequestParam List<Long> eventIds
+    ) {
         PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
-        FavoriteDto favorite = favoriteService.getFavorite(user.getUserId(), eventId);
-        return ResponseEntity.status(200).body(favorite);
+        Map<Long, Boolean> isFavorites = favoriteService.getIsFavorites(user.getUserId(), eventIds);
+        return ResponseEntity.status(200).body(isFavorites);
     }
 }
 

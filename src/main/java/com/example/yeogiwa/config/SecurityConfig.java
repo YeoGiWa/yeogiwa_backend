@@ -1,7 +1,7 @@
 package com.example.yeogiwa.config;
 
-import com.example.yeogiwa.auth.jwt.JwtFilter;
-import com.example.yeogiwa.auth.jwt.JwtUtil;
+import com.example.yeogiwa.auth.JwtFilter;
+import com.example.yeogiwa.util.JwtUtil;
 import com.example.yeogiwa.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -34,7 +34,10 @@ public class SecurityConfig {
     };
 
     public static String[] AllowedGetMethodURLsToPublic = {
-        "/events/**"
+        "/event/{eventId}",
+        "/event/nearby",
+        "/event/list",
+//        "/event/**"
     };
 
     public static String[] AllowedURLsToAdmin = {
